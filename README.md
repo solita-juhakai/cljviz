@@ -1,6 +1,8 @@
 # clj-viz
 
-FIXME: description
+Attempt to turn clj-kondo analysis output to plantuml diagram
+
+FIXME: proper description
 
 ## Installation
 
@@ -15,7 +17,7 @@ FIXME: explanation
 
 How to run clj-kondo analysis
 
-    $ lein clj-kondo --lint ./src/clj_viz/core.clj --config '{:analysis true :output {:format :edn}}'
+    $ lein clj-kondo --lint ./src/cljviz/core.clj --config '{:analysis true :output {:format :edn}}'
 
 Output can be redirected with standard shell output redirection. Output pretty printing can be done with Calva command for replacing current form with pretty printed form.
 
