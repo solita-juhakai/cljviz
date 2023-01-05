@@ -26,8 +26,8 @@
   )
 
 (defn create-plantuml-object "Create plantuml object from a map :name key and :defined-by key"[m]
-  (let [i (str "object " (m :name) " " "<<" (m :defined-by) ">>")] 
-        (println i "as" (underscore-sp-chrs i)) i)
+  (let [i (str \u0022 (m :name) " <<" (m :defined-by) ">>" \u0022)]
+    (str "object " i " as " (underscore-sp-chrs i) "\n"))
   )
 
 
@@ -36,8 +36,7 @@
   [& args]
   (if args
     ((println "@startuml")
-     (apply println (map #(create-plantuml-object %)
-                   (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))))
+     (apply println (map #(create-plantuml-object %) (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))))
      (println "@enduml"))
     (println "Must have at least one argument!")))
 ;;(println "Need an input clj-file or directory")))
@@ -45,6 +44,7 @@
 (comment
   (-main "test")
   (-main)
+  (println \u0022)
   (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")
   (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))
   (merge {:a 1 :b 2} {:a 2 :c 3})
