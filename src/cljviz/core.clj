@@ -77,7 +77,6 @@
   (map #(apply println "object" (create-plantuml-object %) "as" "test") (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
   (create-plantuml-object {:name "tes-t" :t "foo" :defined-by "clojure.core/defn"})
   (@ol)
-  (keyword "mr")
   )
 
 (defn create-pl-ob-package "Create plantuml package section from vector V with first :ns and second map of vars" [v]
@@ -89,26 +88,26 @@
   (@ol)
   )
 
-(defn filter-from-vars "filters maps with key :from-var from :var-usages map in map M" [m]
+(defn filter-from-vars "filters maps with key :from-var from :var-usages map in kondo map M" [m]
   (filter identity (map #(when (:from-var %) %) (m :var-usages))))
 
 (comment
   (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))
+  (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))
   )
 
 (defn create-pl-links [m]
-  (let [frnname (:from m)
-        frnnamens (:from-var m)
-        tn (:name m)
-        tns (:to m)]
+  (let [frnname (keyword (:from-var m))
+        frnnamens (keyword (:from m))
+        tn (keyword (:name m))
+        tns (keyword (:to m))]
         (when (and tn tns frnname frnnamens)
           (let [fr (frnname (frnnamens @ol))
                 to (tn (tns @ol))]
-            (when (and fr to) (str fr " --> " to "\n")))))
-  )
+            (when (some? to) (str fr " --> " to "\n"))))))
 
 (comment
-  (create-pl-links {:end-row 102,
+  (create-pl-links '{:end-row 102,
                     :name-end-col 28,
                     :name-end-row 102,
                     :name-row 102,
@@ -122,6 +121,27 @@
                     :row 102,
                     :to cljviz.core})
   (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
+  (reset! ol {})
+  (some? nil)
+  (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))))
+  (@ol)
+  (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))
+  (create-pl-links '{:arity 1
+                    :col 28
+                    :end-col 42
+                    :end-row 115
+                    :filename
+                    "/home/juhakairamo/Projects/clojure/aoc2022/src/aoc2022/aoc22_8.clj"
+                    :fixed-arities #{1}
+                    :from aoc2022.aoc22-8
+                    :from-var part-1
+                    :name parse-intsXXX
+                    :name-col 29
+                    :name-end-col 39
+                    :name-end-row 115
+                    :name-row 115
+                    :row 115
+                    :to aoc2022.aoc22-8})
   )
 
 (defn -main
@@ -132,6 +152,7 @@
         (if f 
           ((println "@startuml")
            (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions ma)))))
+           (apply println (filter identity (map #(create-pl-links %) (filter-from-vars ma))))
            (println "@enduml"))
           (println "Need an input clj-file or directory"))))
 
