@@ -38,16 +38,6 @@
   (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   )
 
-(defn get-val-as-str-from-edn "get (symbol) value of key K as string from edn map M" [m k]
-  (name ((edn/read-string m) k)))
-
-(comment
-  (name ((edn/read-string "{:ns cljviz.core,
-                           :name create-plantuml-object,
-                           :defined-by clojure.core/defn}") :ns))
-  (get-val-as-str-from-edn "{:ns cljviz.core, :name create-plantuml-object,:defined-by clojure.core/defn}" :name) (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))
-  )
-
 (defn underscore-sp-chrs "replace special chrs with undescore from a string S" [s]
   (string/replace (string/replace (string/replace s #"([-]*)([\p{Alnum}]+)([ -<>/\"\s])" "$2_") #"__" "") #"[ <>]" ""))
 
