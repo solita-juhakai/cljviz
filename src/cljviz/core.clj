@@ -4,7 +4,7 @@
             [clojure.edn :as edn])
   (:gen-class))
 
-(def ol "object links map as {:ns {:var-name :object-link}}" (atom {}))
+(def ol "object links map as {:ns {:var-name \"object-link\"}}" (atom {}))
 
 (defn deep-merge "from https://clojuredocs.org/clojure.core/merge, LICENSE?" [a & maps]
   (if (map? a)
@@ -13,7 +13,7 @@
 
 (comment
   ((reset! ol {})
-   (swap! ol deep-merge {:test-ns {:test-name "link-value"}})
+   (swap! ol deep-merge {(keyword (name "test-ns")) {(keyword "test-name") "link-value"}})
    (swap! ol deep-merge @ol {:test-ns {:test-name-2 "link-value"}})
    (swap! ol deep-merge @ol {:other-ns {:other-name "other-lv"}})
    (:test-name (:test-ns @ol)))
@@ -65,16 +65,19 @@
   (wonky-hash (underscore-sp-chrs "t/fn <<clojure.core/defn>>"))
   )
 
-(defn create-plantuml-object "Create plantuml object from a map :name key and :defined-by key"[m]
+(defn create-plantuml-object "Create plantuml object from a map M :name, :defined-by and :ns key, store object hash to map ol"[m]
   (let [i (str (m :name) " <<" (m :defined-by) ">>")
         pi (wonky-hash (str (underscore-sp-chrs i) "_" (m :ns)))]
-    (swap! ol deep-merge @ol {(m :ns) {(m :name) pi}})
+    (swap! ol deep-merge @ol {(keyword (m :ns)) {(keyword (m :name)) pi}})
     (str "object " \u0022 i \u0022 " as " pi "\n"))
   )
 
-(comment
+(comment 
+  (reset! ol {})
   (map #(apply println "object" (create-plantuml-object %) "as" "test") (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
   (create-plantuml-object {:name "tes-t" :t "foo" :defined-by "clojure.core/defn"})
+  (@ol)
+  (keyword "mr")
   )
 
 (defn create-pl-ob-package "Create plantuml package section from vector V with first :ns and second map of vars" [v]
@@ -82,8 +85,43 @@
     (str "package " i " {" "\n" (apply str (map #(create-plantuml-object %) (second v))) " }" "\n")))
 
 (comment
-  (create-pl-ob-package (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))))
   (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))))
+  (@ol)
+  )
+
+(defn filter-from-vars "filters maps with key :from-var from :var-usages map in map M" [m]
+  (filter identity (map #(when (:from-var %) %) (m :var-usages))))
+
+(comment
+  (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))
+  )
+
+(defn create-pl-links [m]
+  (let [frnname (:from m)
+        frnnamens (:from-var m)
+        tn (:name m)
+        tns (:to m)]
+        (when (and tn tns frnname frnnamens)
+          (let [fr (frnname (frnnamens @ol))
+                to (tn (tns @ol))]
+            (when (and fr to) (str fr " --> " to "\n")))))
+  )
+
+(comment
+  (create-pl-links {:end-row 102,
+                    :name-end-col 28,
+                    :name-end-row 102,
+                    :name-row 102,
+                    :name ol,
+                    :filename "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj",
+                    :from cljviz.core,
+                    :col 26,
+                    :name-col 26,
+                    :from-var filter-from-vars,
+                    :end-col 28,
+                    :row 102,
+                    :to cljviz.core})
+  (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   )
 
 (defn -main
@@ -102,4 +140,6 @@
   (-main "/home/juhakairamo/Projects/clojure/cljviz/src")
   (-main "/home/juhakairamo/Projects/clojure/aoc2022/src")
   (-main)
+  (reset! ol {})
+  (@ol)
   )
