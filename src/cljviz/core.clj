@@ -38,26 +38,17 @@
   (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   )
 
-(defn underscore-sp-chrs "replace special chrs with undescore from a string S" [s]
-  (string/replace (string/replace (string/replace s #"([-]*)([\p{Alnum}]+)([ -<>/\"\s])" "$2_") #"__" "") #"[ <>]" ""))
-
-(comment
-  (underscore-sp-chrs "te-st/fn- \"<<clojure.core/defn>>")
-  (underscore-sp-chrs "2-find-2- -marker-3")
-  )
-
 (defn wonky-hash "Makes a string hash of input string, if initial chr is '-' replace with A " [i]
   (string/replace (str (.hashCode i)) #"^-" "A")
   )
 
 (comment
   (wonky-hash "read_input_clojure_core_defn_")
-  (wonky-hash (underscore-sp-chrs "t/fn <<clojure.core/defn>>"))
   )
 
 (defn create-plantuml-object "Create plantuml object from a map M :name, :defined-by and :ns key, store object hash to map ol"[m]
   (let [i (str (m :name) " <<" (m :defined-by) ">>")
-        pi (wonky-hash (str (underscore-sp-chrs i) "_" (m :ns)))]
+        pi (wonky-hash (str i "_" (m :ns)))]
     (swap! ol deep-merge @ol {(keyword (m :ns)) {(keyword (m :name)) pi}})
     (str "object " \u0022 i \u0022 " as " pi "\n"))
   )
