@@ -150,7 +150,8 @@
   (let [f (first args)
         ma (:analysis (run-lint-analysis f))]
         (if f 
-          ((println "@startuml")
+          (do
+           (println "@startuml")
            (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions ma)))))
            (apply println (filter identity (map #(create-pl-links %) (filter-from-vars ma))))
            (println "@enduml"))
