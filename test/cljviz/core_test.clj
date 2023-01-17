@@ -1,6 +1,6 @@
 (ns cljviz.core-test
   (:require [clojure.test :refer :all]
-            [clj-viz.core :refer :all]))
+            [cljviz.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
