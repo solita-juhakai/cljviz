@@ -55,7 +55,7 @@
         pi (wonky-hash (str i "_" (m :ns)))
         doc (m :doc)]
     (swap! ol deep-merge @ol {(keyword (m :ns)) {(keyword (m :name)) pi}})
-    (str "object " \u0022 i \u0022 " as " pi (when doc (str " {\n" \u0022 doc \u0022 "\n}")) "\n")))
+    (str "object " \u0022 i \u0022 " as " pi (when doc (str " {\n" doc "\n}")) "\n")))
   
 
 (comment 
