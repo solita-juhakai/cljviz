@@ -1,4 +1,4 @@
-(ns cljviz.core 
+(ns cljviz.core
   (:require [clj-kondo.core :as kondo]
             [clojure.string :as string]
             [clojure.edn :as edn])
@@ -81,6 +81,21 @@
   (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))
   (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))
   
+(defn rand-hex []
+  ;;(format "%05d" (rand-int 256))
+  ;;(format (Integer/toHexString (rand-int 256)))
+  (string/replace (format "%2S" (Integer/toHexString (rand-int 256))) #"[ ]" "0")
+  )
+
+(defn rand-color []
+  (str "#" (string/join (repeatedly 3 rand-hex))))
+
+(comment
+  (str "#" (string/join (repeatedly 3 rand-hex)))
+  (string/replace (format "%2S" (Integer/toHexString (rand-int 10))) #"[ ]" "0")
+  (rand-color)
+  (format "%1S" "15a")
+  )
 
 (defn create-pl-links [m]
   (let [frnname (keyword (:from-var m))
@@ -90,7 +105,7 @@
        (when (and tn tns frnname frnnamens)
          (let [fr (frnname (frnnamens @ol))
                to (tn (tns @ol))]
-           (when (some? to) (str fr " --> " to "\n"))))))
+           (when (some? to) (str fr " -[" (rand-color) "]-> " to "\n"))))))
 
 (comment
   (create-pl-links '{:end-row 102,
@@ -147,7 +162,10 @@
   (-main "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")
   (-main "/home/juhakairamo/Projects/clojure/cljviz/src")
   (-main "/home/juhakairamo/Projects/clojure/aoc2022/src")
+  (-main "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")
   (-main)
   (reset! ol {})
-  (@ol))
+  (@ol)
+  (filter identity (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")))))
+  )
   
