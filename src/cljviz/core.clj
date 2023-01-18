@@ -97,15 +97,15 @@
   (format "%1S" "15a")
   )
 
-(defn create-pl-links [m]
+(defn create-pl-links "Creates Plantuml arrow section from object names stored in atom map ol based on map M values" [m]
   (let [frnname (keyword (:from-var m))
         frnnamens (keyword (:from m))
         tn (keyword (:name m))
         tns (keyword (:to m))]
-       (when (and tn tns frnname frnnamens)
-         (let [fr (frnname (frnnamens @ol))
-               to (tn (tns @ol))]
-           (when (some? to) (str fr " -[" (rand-color) "]-> " to "\n"))))))
+    (when (and tn tns frnname frnnamens)
+      (let [fr (frnname (frnnamens @ol))
+            to (tn (tns @ol))]
+        (when (some? to) (str fr " -[" (rand-color) "]-> " to "\n"))))))
 
 (comment
   (create-pl-links '{:end-row 102,
@@ -123,6 +123,7 @@
                      :to cljviz.core})
   (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   (reset! ol {})
+  (empty? @ol)
   (some? nil)
   (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))))
   (@ol)
