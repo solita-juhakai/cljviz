@@ -105,7 +105,8 @@
     (when (and tn tns frnname frnnamens)
       (let [fr (frnname (frnnamens @ol))
             to (tn (tns @ol))]
-        (when (some? to) (str fr " -[" (rand-color) "]-> " to "\n"))))))
+;;        (when (some? to) (str fr " -[" (rand-color) "]-> " to "\n"))))))
+                (when (some? to) (list fr to))))));;(str fr " --> " to "\n"))))))
 
 (comment
   (create-pl-links '{:end-row 102,
@@ -153,10 +154,10 @@
         ma (:analysis (run-lint-analysis f))]
        (if f 
          (do
-          (println "@startuml")
-          (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions ma)))))
-          (apply println (filter identity (map #(create-pl-links %) (filter-from-vars ma))))
-          (println "@enduml"))
+           (println "@startuml")
+           (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions ma)))))
+           (apply println (map #(str (first (nth % 0)) "-["(rand-color)",thickness="(nth % 1)"]->"(second (nth % 0)) ": " (nth % 1) "\n") (frequencies (filter identity (map #(create-pl-links %) (filter-from-vars ma))))))
+           (println "@enduml"))
          (println "Need an input clj-file or directory"))))
 
 (comment
@@ -167,6 +168,7 @@
   (-main)
   (reset! ol {})
   (@ol)
-  (filter identity (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")))))
+  (map #(str (nth % 0) ": " (nth % 1)) (frequencies (filter identity (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")))))))
+  (vals {"test" 2 "test2" 4})
   )
   
