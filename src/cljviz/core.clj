@@ -18,7 +18,7 @@
    (swap! ol deep-merge @ol {:other-ns {:other-name "other-lv"}})
    (:test-name (:test-ns @ol))))
   
-
+;;https://github.com/clj-kondo/clj-kondo/tree/master/analysis
 (defn run-lint-analysis "runs clj-kondo linter with analysis on FILE f" [f]
   (kondo/run! {:lint (list f)
                :config {:analysis true
@@ -46,7 +46,7 @@
   (wonky-hash "read_input_clojure_core_defn_"))
   
 
-(defn create-plantuml-object "Create plantuml object from a map M :name, :defined-by and :ns key, store object hash to map ol"[m]
+(defn create-plantuml-object "Create plantuml object from a map M :name, :defined-by and :ns key, store object hash to map ol" [m]
   ;; object "ns-set <<clojure.core/def>>" as object_ns_set_clojure_core_def {
   ;; dummy is a very long text 1 
   ;; 3 4. with new lines and all
@@ -67,11 +67,12 @@
 
 (defn create-pl-ob-package "Create plantuml package section from vector V with first :ns and second map of vars" [v]
   (let [i (name (first v))]
-    (str "package " i " {" "\n" (apply str (map #(create-plantuml-object %) (second v))) " }" "\n")))
+    (str "package " i " {" "\n" (apply str (into #{} (map #(create-plantuml-object %) (second v)))) " }" "\n")))
 
 (comment
   (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))))
-  (@ol))
+  (@ol)
+  ,,,)
   
 
 (defn filter-from-vars "filters maps with key :from-var from :var-usages map in kondo map M" [m]
@@ -165,6 +166,7 @@
   (-main "/home/juhakairamo/Projects/clojure/cljviz/src")
   (-main "/home/juhakairamo/Projects/clojure/aoc2022/src")
   (-main "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")
+  (-main "/home/juhakairamo/Projects/clojure/tab/src")
   (-main)
   (reset! ol {})
   (@ol)
