@@ -1,7 +1,6 @@
 (ns cljviz.core
   (:require [clj-kondo.core :as kondo]
-            [clojure.string :as string]
-            [clojure.edn :as edn])
+            [clojure.string :as string])
   (:gen-class))
 
 (def ol "object links map as {:ns {:var-name \"object-link\"}}" (atom {}))
@@ -26,7 +25,6 @@
 
 (comment
   (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")
-  (edn/read (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   (group-by :ns (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   (group-by :ns [{:ns 1 :a 2} {:ns 4 :c 45} {:ns 1 :b 2} {:ns 3 :a 2}]))
 
