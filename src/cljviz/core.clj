@@ -38,10 +38,15 @@
 
 (defn wonky-hash "Makes a string hash of input string, if initial chr is '-' replace with A " [i]
   (string/replace (str (.hashCode i)) #"^-" "A"))
+
+(def m-wonky-hash (memoize wonky-hash))
   
 
 (comment
-  (wonky-hash "read_input_clojure_core_defn_"))
+  (wonky-hash "read_input_clojure_core_defn_")
+  (m-wonky-hash (wonky-hash "read_input_clojure_core_defn_"))
+  (m-wonky-hash (wonky-hash "read_input_clojure_core_defn_"))
+  )
   
 
 (defn create-plantuml-object "Create plantuml object from a map M :name, :defined-by and :ns key, store object hash to map ol" [m]
@@ -59,13 +64,14 @@
 (comment 
   (reset! ol {})
   (map #(apply println (create-plantuml-object %)) (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
-  (create-plantuml-object {:name "tes-t" :doc "foo" :defined-by "clojure.core/defn"})
+  (create-plantuml-object {:name "tes-t" :doc "foo" :defined-by "clojure.core/defn" :ns "cljvis.core"})
   (@ol))
   
 
 (defn create-pl-ob-package "Create plantuml package section from vector V with first :ns and second map of vars" [v]
-  (let [i (name (first v))]
-    (str "package " i " {" "\n" (apply str (into #{} (map #(create-plantuml-object %) (second v)))) " }" "\n")))
+  (let [i (name (first v))
+        m (second v)]
+    (str "package " i " {" "\n" (apply str (into #{} (map #(create-plantuml-object %) m))) " }" "\n")))
 
 (comment
   (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))))
@@ -112,7 +118,7 @@
                      :name-end-col 28,
                      :name-end-row 102,
                      :name-row 102,
-                     :name ol,
+                     :name tes-t,
                      :filename "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj",
                      :from cljviz.core,
                      :col 26,
