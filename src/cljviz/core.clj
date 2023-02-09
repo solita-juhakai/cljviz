@@ -3,19 +3,14 @@
             [clojure.string :as string])
   (:gen-class))
 
-(def ol "object links map as {:ns {:var-name \"object-link\"}}" (atom {}))
+;;(def ol "object links map as {:ns {:var-name \"object-link\"}}" (atom {}))
 
-(defn deep-merge "from https://clojuredocs.org/clojure.core/merge, LICENSE?" [a & maps]
-  (if (map? a)
-    (apply merge-with deep-merge a maps)
-    (apply merge-with deep-merge maps)))
-
-(comment
-  ((reset! ol {})
-   (swap! ol deep-merge {(keyword (name "test-ns")) {(keyword "test-name") "link-value"}})
-   (swap! ol deep-merge @ol {:test-ns {:test-name-2 "link-value"}})
-   (swap! ol deep-merge @ol {:other-ns {:other-name "other-lv"}})
-   (:test-name (:test-ns @ol))))
+;; (comment
+;;   ((reset! ol {})
+;;    (swap! ol deep-merge {(keyword (name "test-ns")) {(keyword "test-name") "link-value"}})
+;;    (swap! ol deep-merge @ol {:test-ns {:test-name-2 "link-value"}})
+;;    (swap! ol deep-merge @ol {:other-ns {:other-name "other-lv"}})
+;;    (:test-name (:test-ns @ol))))
   
 ;;https://github.com/clj-kondo/clj-kondo/tree/master/analysis
 (defn run-lint-analysis "runs clj-kondo linter with analysis on FILE f" [f]
@@ -55,17 +50,33 @@
   ;; 3 4. with new lines and all
   ;; testi ng}
   (let [i (str (m :name) " <<" (m :defined-by) ">>")
-        pi (wonky-hash (str i "_" (m :ns)))
+        pi (wonky-hash (str (m :name) "_" (m :ns)))
         doc (m :doc)]
-    (swap! ol deep-merge @ol {(keyword (m :ns)) {(keyword (m :name)) pi}})
+;;    (swap! ol deep-merge @ol {(keyword (m :ns)) {(keyword (m :name)) pi}})
     (str "object " \u0022 i \u0022 " as " pi (when doc (str " {\n" doc "\n}")) "\n")))
   
 
-(comment 
-  (reset! ol {})
+(comment
+;;  (reset! ol {})
   (map #(apply println (create-plantuml-object %)) (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
   (create-plantuml-object {:name "tes-t" :doc "foo" :defined-by "clojure.core/defn" :ns "cljvis.core"})
-  (@ol))
+  ;;(@ol)
+  (def t-m '{:col 1
+             :defined-by clojure.core/defn
+             :doc "runs clj-kondo linter with analysis on FILE f"
+             :end-col 51
+             :end-row 19
+             :filename "./src/cljviz/core.clj"
+             :fixed-arities #{1}
+             :name run-lint-analysis
+             :name-col 7
+             :name-end-col 24
+             :name-end-row 16
+             :name-row 16
+             :ns cljviz.core
+             :row 16})
+  (wonky-hash (str (t-m :name) "_" (t-m :ns)))
+  )
   
 
 (defn create-pl-ob-package "Create plantuml package section from vector V with first :ns and second map of vars" [v]
@@ -75,16 +86,35 @@
 
 (comment
   (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))))
-  (@ol)
+ ;; (@ol)
   ,,,)
   
 
 (defn filter-from-vars "filters maps with key :from-var from :var-usages map in kondo map M" [m]
   (filter identity (map #(when (:from-var %) %) (m :var-usages))))
 
+;; select elements using reduce-kv & filter
+;; https://clojuredocs.org/clojure.core/reduce-kv
+(defn multi-pred [coll m]
+  (reduce-kv
+   (fn [erg k v] (filter #(= v (k %)) erg)) coll m))
+
+(defn filter-usage-var-defs "filter maps from :var-usages that have (and (and :from :from-var) (and :ns :to) in :var-definitions m-v" [m m-v]
+  (merge (multi-pred (m-v) {:name (m :from-var) :ns (m :from-var)}) (multi-pred (m-v :var-definitions) {:name (m :name) :ns (m :to)})))
+
 (comment
+  (map #(:from-var %) (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))
-  (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))
+  (def v-d (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
+  (v-d)
+  ()
+  (def v-u (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))) 
+  (v-u)
+  (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))
+  (def m-pred '{:from-var create-pl-ob-package :from cljviz.core :to cljviz.core})
+  (multi-pred v-u m-pred)
+  )
+
   
 (defn rand-hex []
   ;;(format "%05d" (rand-int 256))
@@ -103,15 +133,14 @@
   )
 
 (defn create-pl-links "Creates Plantuml arrow section from object names stored in atom map ol based on map M values" [m]
-  (let [frnname (keyword (:from-var m))
-        frnnamens (keyword (:from m))
-        tn (keyword (:name m))
-        tns (keyword (:to m))]
+  (let [frnname (m :from-var)
+        frnnamens (m :from)
+        tn (m :name)
+        tns (m :to)]
     (when (and tn tns frnname frnnamens)
-      (let [fr (frnname (frnnamens @ol))
-            to (tn (tns @ol))]
-;;        (when (some? to) (str fr " -[" (rand-color) "]-> " to "\n"))))))
-                (when (some? to) (list fr to))))));;(str fr " --> " to "\n"))))))
+      (let [fr (wonky-hash (str frnname "_" frnnamens))
+            to (wonky-hash (str tn "_" tns))]
+        (when (some? to) (list fr to))))))
 
 (comment
   (create-pl-links '{:end-row 102,
@@ -127,12 +156,30 @@
                      :end-col 28,
                      :row 102,
                      :to cljviz.core})
+  (def l-m '{:arity 1
+             :col 23
+             :end-col 44
+             :end-row 156
+             :filename "./src/cljviz/core.clj"
+             :fixed-arities #{1}
+             :from cljviz.core
+             :from-var -main
+             :name run-lint-analysis
+             :name-col 24
+             :name-end-col 41
+             :name-end-row 156
+             :name-row 156
+             :row 156
+             :to cljviz.core})
+  (:from-var l-m)
+  (wonky-hash (str (l-m :from-var) "_" (l-m :from)))
+  (wonky-hash (str (l-m :name) "_" (l-m :to)))
   (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
-  (reset! ol {})
-  (empty? @ol)
+  ;; (reset! ol {})
+  ;; (empty? @ol)
   (some? nil)
   (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))))
-  (@ol)
+;;  (@ol)
   (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src"))))
   (create-pl-links '{:arity 1
                      :col 28
@@ -149,17 +196,18 @@
                      :name-end-row 115
                      :name-row 115
                      :row 115
-                     :to aoc2022.aoc22-8}))
+                     :to aoc2022.aoc22-8})
+  )
   
 
 (defn -main
-  "Attempt to turn clj-kondo analysis output to plantuml diagram. Input argument clj-file or directory, output plantuml description."
+  "Cljviz turns clj-kondo analysis output to plantuml diagram. Input argument clj-file or directory, output plantuml description."
   [& args]
   (let [f (first args)
         ma (:analysis (run-lint-analysis f))]
        (if f 
          (do
-           (println "@startuml")
+           (println "@startuml" f)
            (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions ma)))))
            (apply println (map #(str (first (nth % 0)) "-["(rand-color)",thickness="(nth % 1)"]->"(second (nth % 0)) ": " (nth % 1) "\n") (frequencies (filter identity (map #(create-pl-links %) (filter-from-vars ma))))))
            (println "@enduml"))
@@ -172,8 +220,8 @@
   (-main "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")
   (-main "/home/juhakairamo/Projects/clojure/tab/src")
   (-main)
-  (reset! ol {})
-  (@ol)
+  ;; (reset! ol {})
+  ;; (@ol)
   (map #(str (nth % 0) ": " (nth % 1)) (frequencies (filter identity (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")))))))
   (vals {"test" 2 "test2" 4})
   )
