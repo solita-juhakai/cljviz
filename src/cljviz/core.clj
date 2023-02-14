@@ -93,9 +93,10 @@
 (defn filter-from-vars "filters maps with key :from-var from :var-usages map in kondo map M" [m]
   (filter identity (map #(when (:from-var %) %) (m :var-usages))))
 
-;; select elements using reduce-kv & filter
-;; https://clojuredocs.org/clojure.core/reduce-kv
+
 (defn multi-pred [coll m]
+  ;; select elements using reduce-kv & filter
+  ;; https://clojuredocs.org/clojure.core/reduce-kv
   (reduce-kv
    (fn [erg k v] (filter #(= v (k %)) erg)) coll m))
 
@@ -222,12 +223,15 @@
   "Cljviz turns clj-kondo analysis output to plantuml diagram. Input argument clj-file or directory, output plantuml description."
   [& args]
   (let [f (first args)
-        ma (:analysis (run-lint-analysis f))]
+        ma (:analysis (run-lint-analysis f))
+        m-d (:var-definitions ma)
+        m-u (:var-usages ma)]
        (if f 
          (do
            (println "@startuml" f)
-           (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions ma)))))
-           (apply println (map #(str (first (nth % 0)) "-["(rand-color)",thickness="(nth % 1)"]->"(second (nth % 0)) ": " (nth % 1) "\n") (frequencies (filter identity (map #(create-pl-links %) (filter-from-vars ma))))))
+           (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys m-d))))
+           (apply println 
+                  (map #(str (first (nth % 0)) "-[" (rand-color) ",thickness=" (nth % 1) "]->" (second (nth % 0)) ": " (nth % 1) "\n") (frequencies (filter identity (map #(create-pl-links %) (filter identity (map #(filter-usage-var-defs % m-d) m-u)))))))
            (println "@enduml"))
          (println "Need an input clj-file or directory"))))
 
@@ -242,5 +246,7 @@
   ;; (@ol)
   (map #(str (nth % 0) ": " (nth % 1)) (frequencies (filter identity (map #(create-pl-links %) (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")))))))
   (vals {"test" 2 "test2" 4})
+  (def m-d-t (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
+  (map #(filter-usage-var-defs % m-d-t) (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj" ))))
   )
   
