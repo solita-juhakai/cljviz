@@ -99,20 +99,38 @@
   (reduce-kv
    (fn [erg k v] (filter #(= v (k %)) erg)) coll m))
 
-(defn filter-usage-var-defs "filter maps from :var-usages that have (and (and :from :from-var) (and :ns :to) in :var-definitions m-v" [m m-v]
-  (merge (multi-pred (m-v) {:name (m :from-var) :ns (m :from-var)}) (multi-pred (m-v :var-definitions) {:name (m :name) :ns (m :to)})))
+(defn filter-usage-var-defs "filter maps from :var-usages that have (and (and :from :from-var) (and :ns :to) in :var-definitions m-d" [m m-d]
+  (let [a (multi-pred m-d {:name (m :from-var) :ns (m :from)})
+        b (multi-pred m-d {:name (m :name) :ns (m :to)})]
+    (when (and (when (seq a) a) (when (seq b) b)) m)))
 
 (comment
   (map #(:from-var %) (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))
   (def v-d (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
-  (v-d)
-  ()
+  (v-d) 
   (def v-u (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))) 
   (v-u)
   (filter-from-vars (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))
-  (def m-pred '{:from-var create-pl-ob-package :from cljviz.core :to cljviz.core})
+  (def m-pred '{:from-var create-pl-ob-package :from cljviz.core :to cljviz.core :name create-plantuml-object})
   (multi-pred v-u m-pred)
+  (def test-m ' {:col 28
+                 :end-col 38
+                 :end-row 37
+                 :filename "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"
+                 :fixed-arities #{1}
+                 :from cljviz.core
+                 :from-var m-wonky-hash-
+                 :name wonky-hash
+                 :name-col 28
+                 :name-end-col 38
+                 :name-end-row 37
+                 :name-row 37
+                 :row 37
+                 :to cljviz.core})
+  (test-m)
+  (seq '())
+  (filter-usage-var-defs test-m v-d)
   )
 
   
