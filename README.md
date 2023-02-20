@@ -1,53 +1,60 @@
-# clj-viz
+# cljviz
 
-Attempt to turn clj-kondo analysis output to plantuml diagram
+Cljviz turns your clojure project's clj-kondo analysis output to plantuml diagram.
 
-FIXME: proper description
+
+>**NOTE**
+>cljviz is **alpha** code and made by a total clojure newbie. 
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Download code and see Usage. You will also need [plantuml](https://plantuml.com) and image viewer.
 
-clj-kondo to be installed as leiningen plugin as described in https://github.com/clj-kondo/lein-clj-kondo
 ## Usage
 
-FIXME: explanation
+Only input argument for cljviz is clj-file or source directory. Cljviz output (stdout) is plantuml description.
 
-    $ java -jar clj-viz-0.1.0-standalone.jar [args]
+Change to download directory and run
 
-How to run clj-kondo analysis
+    $ lein run <clojure project clj-file or src-dir> > example.plantuml
 
-    $ lein clj-kondo --lint ./src/cljviz/core.clj --config '{:analysis true :output {:format :edn}}'
+Then plantuml is needed to turn output into e.g. a png image
 
-Output can be redirected with standard shell output redirection. Output pretty printing can be done with Calva command for replacing current form with pretty printed form.
+    $ plantuml example.plantuml
+
+Open resulting example.png image with image viewer.
 
 ## Options
 
-FIXME: listing of options this app accepts.
+No options supported at this point.
 
-## Examples
+### Known issues
 
-...
+- Generated diagram is an UML class diagram, which is obviously wrong in clojure context.
 
-### Bugs
+- If your project is big, plantuml may run out of memory and part of image will not be generated. Try to give more memory to plantuml with e.g.
 
-...
+    $ export PLANTUML_LIMIT_SIZE=12288
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+- Tested only in linux.
+
+### Future plans
+
+- move from plantuml to plain graphviz
+- generate web output for browser usage, maybe imagemap based
+- proper cli arg support
+
+
+### About clj-kondo
+
+clj-kondo can be installed as leiningen plugin as described in https://github.com/clj-kondo/lein-clj-kondo
+
+How to run clj-kondo analysis from cli
+
+    $ lein clj-kondo --lint ./src/cljviz/core.clj --config '{:analysis true :output {:format :edn}}'
+
+Analysis output can be redirected with standard shell output redirection. Output pretty printing can be done with Calva command for replacing current form with pretty printed form.
 
 ## License
 
-Copyright © 2023 FIXME
-
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
-
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+MIT License
