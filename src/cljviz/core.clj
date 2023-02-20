@@ -177,7 +177,7 @@
         m-u (:var-usages ma)]
        (if f 
          (do
-           (println "@startuml" f)
+           (println "@startuml" (last (string/split f #"/")))
            (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys m-d))))
            (apply println 
                   (map #(str (first (nth % 0)) "-[" (rand-color) ",thickness=" (nth % 1) "]->" (second (nth % 0)) ": " (nth % 1) "\n")
@@ -193,7 +193,8 @@
   (-main "/home/juhakairamo/Projects/clojure/aoc2022/src")
   (-main "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")
   (-main "/home/juhakairamo/Projects/clojure/tab/src")
-  (-main)
+  (-main "./src")
+  (last (string/split "c" #"/"))
   (def m-d-t (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   (map #(filter-usage-var-defs % m-d-t) (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   )

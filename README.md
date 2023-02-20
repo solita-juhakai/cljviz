@@ -12,7 +12,7 @@ Download code and see Usage. You will also need [plantuml](https://plantuml.com)
 
 ## Usage
 
-Only input argument for cljviz is clj-file or directory. Cljviz output (stdout) is plantuml description.
+Only input argument for cljviz is clj-file or source directory. Cljviz output (stdout) is plantuml description.
 
 Change to download directory and run
 
@@ -29,11 +29,14 @@ Open resulting example.png image with image viewer.
 No options supported at this point.
 
 ### Known issues
-Generated diagram is an UML class diagram, which is obviously wrong in clojure context.
 
-If your project is big, plantuml may run out of memory and part of image will not be generated. Try to give more memory to plantuml with e.g.
+- Generated diagram is an UML class diagram, which is obviously wrong in clojure context.
+
+- If your project is big, plantuml may run out of memory and part of image will not be generated. Try to give more memory to plantuml with e.g.
 
     $ export PLANTUML_LIMIT_SIZE=12288
+
+- Tested only in linux.
 
 ### Future plans
 
