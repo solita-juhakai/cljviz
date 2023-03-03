@@ -1,0 +1,4 @@
+{:paths ["src"]
+ :deps {org.clojure/clojure {:mvn/version "1.10.0"}
+        clj-kondo/clj-kondo {:mvn/version "2022.12.11-SNAPSHOT"}}
+ :aliases {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.9.3" :git/sha "e537cd1"}}}}}
