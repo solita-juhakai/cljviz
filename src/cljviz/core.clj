@@ -37,14 +37,18 @@
   ;; dummy is a very long text 1 
   ;; 3 4. with new lines and all
   ;; testi ng}
-  (let [i (str (m :name) " <<" (m :defined-by) ">>")
+  (let [dn (str (m :name))
+        ds (last (string/split (name (m :defined-by)) #"/"))
+;        i (str (m :name) " <<" (last (string/split (name (m :defined-by)) #"/")) ">>")
         pi (m-wonky-hash (str (m :name) "_" (m :ns)))
         doc (m :doc)]
-    (str "object " \u0022 i \u0022 " as " pi (when doc (str " {\n" doc "\n}")) "\n"))) 
+    (when (not (= "declare" ds)) 
+      (str "object " \u0022 dn " <<" ds ">>" \u0022 " as " pi (when doc (str " {\n" doc "\n}")) "\n")))) 
 
 (comment
   (map #(apply println (create-plantuml-object %)) (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
-  (create-plantuml-object {:name "tes-t" :doc "foo" :defined-by "clojure.core/defn" :ns "cljvis.core"}) 
+  (create-plantuml-object {:name "tes-t" :doc "foo" :defined-by "clojure.core/defn" :ns "cljvis.core"})
+    (create-plantuml-object {:name "tes-t" :doc "foo" :defined-by "clojure.core/declare" :ns "cljvis.core"})
   (def t-m '{:col 1
              :defined-by clojure.core/defn
              :doc "runs clj-kondo linter with analysis on FILE f"
@@ -60,6 +64,7 @@
              :ns cljviz.core
              :row 16})
   (m-wonky-hash (str (t-m :name) "_" (t-m :ns)))
+  (compare "declare" "declare")
   )
   
 
