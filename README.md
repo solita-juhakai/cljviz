@@ -1,22 +1,24 @@
 # cljviz
 
-Cljviz turns your clojure project's clj-kondo analysis output to plantuml diagram.
+Cljviz turns your clojure project's clj-kondo analysis output to visual diagram.
 
 
 >**NOTE**
->cljviz is **alpha** code and made by a total clojure newbie. 
+>cljviz is **alpha** code and made as a clojure learning project. 
 
 ## Installation
 
-Download code and see Usage. You will also need [plantuml](https://plantuml.com) and image viewer.
+Download code and see Usage. You will need [plantuml](https://plantuml.com) and/or [graphviz](https://graphviz.org) tools. Image viewer is also needed.
 
 ## Usage
 
-Only input argument for cljviz is clj-file or source directory. Cljviz output (stdout) is plantuml description.
+Input arguments for cljviz are clj-file or source directory and output type (pl | gv). Cljviz output (stdout) is plantuml or graphviz (dot-language) description.
+
+### Plantuml output
 
 Change to download directory and run
 
-    $ lein run <clojure project clj-file or src-dir> > example.plantuml
+    $ lein run <clojure project clj-file or src-dir> pl > example.plantuml
 
 Then plantuml is needed to turn output into e.g. a png image
 
@@ -24,13 +26,25 @@ Then plantuml is needed to turn output into e.g. a png image
 
 Open resulting example.png image with image viewer.
 
+### Graphviz output
+
+Change to download directory and run
+
+    $ lein run <clojure project clj-file or src-dir> gv > example.gv
+
+Then graphviz dot-command is needed to turn output into e.g. a png image
+
+    $ dot -v -Tpng -oexample.png example.gv
+
+Open resulting example.png image with image viewer.
+
 ## Options
 
-No options supported at this point.
+No other options supported at this point.
 
 ### Known issues
 
-- Generated diagram is an UML class diagram, which is obviously wrong in clojure context.
+- Generated diagram resembles an UML class diagram, which is obviously wrong in clojure context.
 
 - If your project is big, plantuml may run out of memory and part of image will not be generated. Try to give more memory to plantuml with e.g.
 
@@ -40,7 +54,7 @@ No options supported at this point.
 
 ### Future plans
 
-- move from plantuml to plain graphviz
+- move from plantuml to plain graphviz (added)
 - generate web output for browser usage, maybe imagemap based
 - proper cli arg support
 

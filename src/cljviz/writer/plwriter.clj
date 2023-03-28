@@ -1,6 +1,7 @@
 (ns cljviz.writer.plwriter 
   (:require [cljviz.util.lint :refer [run-lint-analysis]]
-            [cljviz.util.utils :refer [filter-var-def-keys m-wonky-hash]]
+            [cljviz.util.utils :refer [filter-usage-var-defs
+                                       filter-var-def-keys m-wonky-hash rand-color]]
             [clojure.string :as string]))
 
 (defn create-plantuml-object "Create plantuml object from a map M :name, :defined-by and :ns key" [m]
@@ -89,3 +90,16 @@
                      :row 115
                      :to aoc2022.aoc22-8}))
 
+(defn main-pl-writer "Main writer for plantuml output" [f]
+  (let [ma (:analysis (run-lint-analysis f))
+        m-d (:var-definitions ma)
+        m-u (:var-usages ma)]
+    (do
+      (println "@startuml" (last (string/split f #"/")))
+      (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys m-d))))
+      (apply println
+             (map #(str (first (nth % 0)) "-[" (rand-color) ",thickness=" (nth % 1) "]->" (second (nth % 0)) ": " (nth % 1) "\n")
+                  (frequencies
+                   (filter identity (map #(create-pl-links %)
+                                         (filter identity (map #(filter-usage-var-defs % m-d) m-u)))))))
+      (println "@enduml"))))
