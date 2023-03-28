@@ -1,7 +1,7 @@
 (ns cljviz.writer.dotwriter 
   (:require [cljviz.util.lint :refer [run-lint-analysis]]
             [cljviz.util.utils :refer [filter-usage-var-defs
-                                       filter-var-def-keys m-wonky-hash rand-color]]
+                                       filter-var-def-keys m-wonky-hash rand-color xml-escape]]
             [clojure.string :as string]))
 
 (defn create-dot-node "Create dot node from a map M :name, :defined-by and :ns key" [m]
@@ -11,15 +11,19 @@
   ;; testi ng}
   (let [dn (str (m :name))
         ds (last (string/split (name (m :defined-by)) #"/"))
-        node (str dn "<<" ds ">>")
+        node (str dn " <<" ds ">>")
         pi (m-wonky-hash (str (m :name) "_" (m :ns)))
         doc (m :doc)]
     (when (not (= "declare" ds))
       (str pi 
            "[\n"
            "id=" pi "\n"
-           "label="\u0022 node \u0022"\n"
-           (when doc (str "doc=" \u0022 doc \u0022 "\n"))
+;           "rankdir=" \u0022 "LR" \u0022 "\n"
+           "label=" \u0022 "{" (xml-escape node) "||" "}" \u0022 "\n"
+           "shape=" \u0022 "record" \u0022 "\n"
+           "style=filled\n"
+           "fillcolor=lightyellow\n"
+           (when doc (str "doc=" \u0022 (xml-escape doc) \u0022 "\n"))
            "];\n"))))
 
 (comment
@@ -49,7 +53,9 @@
   (let [i (name (first v))
         ri (string/replace i #"\." "_")
         m (second v)]
-    (str "subgraph cluster_" ri " {" "\n" (apply str (into #{} (map #(create-dot-node %) m))) "\n label=" \u0022 i \u0022 "}" "\n")))
+    (str "subgraph cluster_" ri " {" "\n" 
+         (apply str (into #{} (map #(create-dot-node %) m)))
+         "\n label=" \u0022 (xml-escape i) \u0022 "}" "\n")))
 
 (comment
   (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))))))
@@ -104,11 +110,11 @@
     (do
       (println "digraph" (last (string/split f #"/")) "{")
       (apply println (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys m-d))))
-      #_(apply println
-               (map #(str (first (nth % 0)) "-[" (rand-color) ",thickness=" (nth % 1) "]->" (second (nth % 0)) ": " (nth % 1) "\n")
-                    (frequencies
-                     (filter identity (map #(create-dot-links %)
-                                           (filter identity (map #(filter-usage-var-defs % m-d) m-u)))))))
-      (apply println (filter identity (map #(create-dot-links %) (filter identity (map #(filter-usage-var-defs % m-d) m-u)))))
+      ;    edge [penwidth=1; color="#40e0d0"] node1 -> node2
+      (apply println
+             (map #(str "edge [penwidth=" (second %) "; color=" \u0022 (rand-color) \u0022 ";""label=" (second %) "] " (first %))
+                  (frequencies
+                   (filter identity (map #(create-dot-links %) 
+                                         (filter identity (map #(filter-usage-var-defs % m-d) m-u))))))) 
       (println "}"))))
 
