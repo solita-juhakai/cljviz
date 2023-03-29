@@ -108,13 +108,13 @@
         m-d (:var-definitions ma)
         m-u (:var-usages ma)]
     (do
-      (println "digraph" (last (string/split f #"/")) "{")
-      (apply println (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys m-d))))
+      (str "digraph" (last (string/split f #"/")) "{\n"
+      (apply str (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys m-d))))
       ;    edge [penwidth=1; color="#40e0d0"] node1 -> node2
-      (apply println
+      (apply str
              (map #(str "edge [penwidth=" (second %) "; color=" \u0022 (rand-color) \u0022 ";""label=" (second %) "] " (first %))
                   (frequencies
                    (filter identity (map #(create-dot-links %) 
                                          (filter identity (map #(filter-usage-var-defs % m-d) m-u))))))) 
-      (println "}"))))
+      (str "}\n")))))
 

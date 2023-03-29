@@ -1,5 +1,6 @@
 (ns cljviz.core
-  (:require [cljviz.util.lint :refer [run-lint-analysis]]
+  (:require [cljviz.util.http :refer [start-http]]
+            [cljviz.util.lint :refer [run-lint-analysis]]
             [cljviz.util.utils :refer [filter-usage-var-defs]]
             [cljviz.writer.dotwriter :refer [main-dot-writer]]
             [cljviz.writer.plwriter :refer [main-pl-writer]]
@@ -18,7 +19,8 @@
       (cond
         (= o "pl") (main-pl-writer f)
         (= o "gv") (main-dot-writer f)
-        :else (println "Need proper output type"))
+        :else (do 
+                (start-http f)))
       (println "Need an input clj-file or directory"))))
 
 (comment
