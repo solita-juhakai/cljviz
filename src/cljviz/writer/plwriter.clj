@@ -39,7 +39,7 @@
   (compare "declare" "declare"))
 
 
-(defn create-pl-ob-package "Create plantuml package section from vector V with first :ns and second map of vars" [v]
+(defn create-pl-ob-package "Create plantuml package section from vector V with first item :ns and second item map of vars" [v]
   (let [i (name (first v))
         m (second v)]
     (str "package " i " {" "\n" (apply str (into #{} (map #(create-plantuml-object %) m))) " }" "\n")))
@@ -48,7 +48,7 @@
   (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))))))
 
 
-(defn create-pl-links "Provides Plantuml relationship section links based on map M :from-var :from :name and :to values" [m]
+(defn create-pl-links "Provides plantuml relationship section links based on map M :from-var :from :name and :to values" [m]
   (let [frnname (m :from-var)
         frnnamens (m :from)
         tn (m :name)
@@ -97,6 +97,7 @@
     (do
       (println "@startuml" (last (string/split f #"/")))
       (apply println (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys m-d))))
+      ;TO-DO use thread-macro
       (apply println
              (map #(str (first (nth % 0)) "-[" (rand-color) ",thickness=" (nth % 1) "]->" (second (nth % 0)) ": " (nth % 1) "\n")
                   (frequencies

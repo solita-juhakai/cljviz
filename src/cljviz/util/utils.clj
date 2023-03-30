@@ -64,17 +64,10 @@
   (rand-color)
   (format "%1S" "15a"))
 
-;; (def escapes [{:match "&" :replace "&amp;"}
-;;               {:match "<" :replace "&lt;"}
-;;               {:match ">" :replace "&gt;"}
-;;               {:match "\"" :replace "&quot;"}
-;;               {:match "'" :replace "&apos;"}])
-
-(defn xml-escape "escape XML special characters from string S" [s] 
-  ;;(apply (string/replace (str s) "&" "&amp;") "<" "&lt;")
-  ;;(doseq [[k v] (map identity escapes)]
-  ;;  (string/replace s k v)))
-  ;; To-DO ugly
+(defn xml-escape 
+  "escape XML special characters from string S" 
+  [s] 
+  ;; TO-DO ugly
   (-> s
       (string/replace "&" "&amp;")
       (string/replace "<" "&lt;")
@@ -84,11 +77,20 @@
 
 (comment
   (xml-escape "3& fwepgqew    eeee \"\"\"")
-;  (for [x escapes] (string/replace "#45<6&"(:match x) (:replace x)))
   (-> "rt&9 < > \" fewe ''|"
       (string/replace "&" "&amp;")
       (string/replace "<" "&lt;")
       (string/replace ">" "&gt;")
       (string/replace "\"" "&quot;")
       (string/replace "'" "&apos;"))
+  )
+
+
+(defn graph-escape "escapes graph chars for string S" [s]
+  (-> s
+      (string/replace #"\." "_")
+      (string/replace "-" "_")))
+
+(comment
+  (graph-escape "...--test--te")
   )

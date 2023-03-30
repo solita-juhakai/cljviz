@@ -1,5 +1,6 @@
 (ns cljviz.core
-  (:require [cljviz.util.lint :refer [run-lint-analysis]]
+  (:require [cljviz.util.http :refer [start-http]]
+            [cljviz.util.lint :refer [run-lint-analysis]]
             [cljviz.util.utils :refer [filter-usage-var-defs]]
             [cljviz.writer.dotwriter :refer [main-dot-writer]]
             [cljviz.writer.plwriter :refer [main-pl-writer]]
@@ -7,7 +8,7 @@
   (:gen-class))
 
 (defn -main
-  "Cljviz turns clj-kondo analysis output to plantuml diagram. First input argument clj-file or directory, second output type (pl or gv), output is string presentation of chosen output type."
+  "Cljviz turns clj-kondo analysis output to visul diagram. First input argument clj-file or directory, second output type (pl or gv), output is string presentation of chosen output type."
   [& args]
   (let [f (first args)
         o (second args)]
@@ -17,8 +18,8 @@
     (if f
       (cond
         (= o "pl") (main-pl-writer f)
-        (= o "gv") (main-dot-writer f)
-        :else (println "Need proper output type"))
+        (= o "gv") (println (main-dot-writer f))
+        :else (start-http f))
       (println "Need an input clj-file or directory"))))
 
 (comment
