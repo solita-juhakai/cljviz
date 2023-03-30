@@ -8,11 +8,19 @@ Cljviz turns your clojure project's clj-kondo analysis output to visual diagram.
 
 ## Installation
 
-Download code and see Usage. You will need [plantuml](https://plantuml.com) and/or [graphviz](https://graphviz.org) tools. Image viewer is also needed.
+Download code and see Usage. You will need [plantuml](https://plantuml.com) and/or [graphviz](https://graphviz.org) tools. Graphviz `dot`-command needs to be in PATH. Image viewer is also needed.
 
 ## Usage
 
-Input arguments for cljviz are clj-file or source directory and output type (pl | gv). Cljviz output (stdout) is plantuml or graphviz (dot-language) description.
+Input arguments for cljviz are clj-file or source directory and optionally output type (pl | gv). Cljviz output (stdout) is plantuml or graphviz (dot-language) description.
+
+### Browser output
+
+Change to download directory and run
+
+    $ lein run *<clojure project clj-file or src-dir>*
+
+Open http://localhost:3000 with browser.
 
 ### Plantuml output
 
@@ -55,8 +63,9 @@ No other options supported at this point.
 ### Future plans
 
 - move from plantuml to plain graphviz (added)
-- generate web output for browser usage, maybe imagemap based
+- generate web output for browser usage, maybe imagemap based (added basic svg)
 - proper cli arg support
+- template based output format
 
 
 ### About clj-kondo
