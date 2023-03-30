@@ -66,6 +66,7 @@ No other options supported at this point.
 - generate web output for browser usage, maybe imagemap based (added basic svg)
 - proper cli arg support
 - template based output format
+- namespace only view 
 
 
 ### About clj-kondo

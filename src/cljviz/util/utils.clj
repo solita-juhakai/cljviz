@@ -84,3 +84,13 @@
       (string/replace "\"" "&quot;")
       (string/replace "'" "&apos;"))
   )
+
+
+(defn graph-escape "escapes graph chars for string S" [s]
+  (-> s
+      (string/replace #"\." "_")
+      (string/replace "-" "_")))
+
+(comment
+  (graph-escape "...--test--te")
+  )

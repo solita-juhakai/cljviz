@@ -1,7 +1,8 @@
 (ns cljviz.writer.dotwriter 
   (:require [cljviz.util.lint :refer [run-lint-analysis]]
             [cljviz.util.utils :refer [filter-usage-var-defs
-                                       filter-var-def-keys m-wonky-hash rand-color xml-escape]]
+                                       filter-var-def-keys graph-escape
+                                       m-wonky-hash rand-color xml-escape]]
             [clojure.string :as string]))
 
 (defn create-dot-node "Create dot node from a map M :name, :defined-by and :ns key" [m]
@@ -15,15 +16,15 @@
         pi (m-wonky-hash (str (m :name) "_" (m :ns)))
         doc (m :doc)]
     (when (not (= "declare" ds))
-      (str pi 
+      (str pi
            "[\n"
            "id=" pi "\n"
 ;           "rankdir=" \u0022 "LR" \u0022 "\n"
-           "label=" \u0022 "{" (xml-escape node) "||" "}" \u0022 "\n"
-           "shape=" \u0022 "record" \u0022 "\n"
-           "style=filled\n"
-           "fillcolor=lightyellow\n"
-           (when doc (str "doc=" \u0022 (xml-escape doc) \u0022 "\n"))
+           ;"label=" \u0022 "{" (xml-escape node) "|"(when doc (label-escape doc)) "|}" \u0022 "\n"
+           "shape=plaintext\n"
+           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow"\u0022 " CELLSPACING="\u0022"0"\u0022"><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when doc (xml-escape doc)) "</TD></TR></TABLE>>\n"
+;           "style=filled\n"
+;           "fillcolor=lightyellow\n"
            "];\n"))))
 
 (comment
@@ -48,10 +49,9 @@
   (compare "declare" "declare"))
   
 
-
 (defn create-dot-subgraph "Create dot subgraph from vector V with first :ns and second map of vars" [v]
   (let [i (name (first v))
-        ri (string/replace i #"\." "_")
+        ri (graph-escape i)
         m (second v)]
     (str "subgraph cluster_" ri " {" "\n" 
          (apply str (into #{} (map #(create-dot-node %) m)))
@@ -108,7 +108,7 @@
         m-d (:var-definitions ma)
         m-u (:var-usages ma)]
     (do
-      (str "digraph " (last (string/split f #"/")) "{\n"
+      (str "digraph " (graph-escape (last (string/split f #"/"))) "{\n"
            (apply str (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys m-d))))
       ;    edge [penwidth=1; color="#40e0d0"] node1 -> node2
       ;    TO-DO use thread-macro
