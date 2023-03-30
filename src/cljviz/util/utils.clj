@@ -94,3 +94,7 @@
 (comment
   (graph-escape "...--test--te")
   )
+
+(defn br-align "replace newlines in string s with <BR ALIGN= LEFT></BR>" [s]
+  (-> s
+   (string/replace "\n" "<BR ALIGN=\"LEFT\"></BR>")))
