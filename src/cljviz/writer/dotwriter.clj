@@ -108,7 +108,7 @@
         m-d (:var-definitions ma)
         m-u (:var-usages ma)]
     (do
-      (str "digraph" (last (string/split f #"/")) "{\n"
+      (str "digraph " (last (string/split f #"/")) "{\n"
       (apply str (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys m-d))))
       ;    edge [penwidth=1; color="#40e0d0"] node1 -> node2
       (apply str
