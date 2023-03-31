@@ -49,7 +49,10 @@
   (compare "declare" "declare"))
   
 
-(defn create-dot-subgraph "Create dot subgraph from vector V with first :ns and second map of vars" [v]
+(defn create-dot-subgraph
+  "Create dot subgraph from vector V
+   with first :ns and second map of vars"
+  [v]
   (let [i (name (first v))
         ri (graph-escape i)
         m (second v)]
@@ -61,7 +64,10 @@
   (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))))))
 
 
-(defn create-dot-links "Provides dot relationship section links based on map M :from-var :from :name and :to values" [m]
+(defn create-dot-links 
+  "Provides dot relationship section links
+   based on map M :from-var :from :name and :to values"
+  [m]
   (let [frnname (m :from-var)
         frnnamens (m :from)
         tn (m :name)
@@ -103,7 +109,9 @@
                       :row 115
                       :to aoc2022.aoc22-8}))
 
-(defn main-dot-writer "Main writer for graphviz output" [f]
+(defn main-dot-writer 
+  "Main writer for graphviz output" 
+  [f]
   (let [ma (:analysis (run-lint-analysis f))
         m-d (:var-definitions ma)
         m-u (:var-usages ma)]

@@ -8,7 +8,10 @@
   (:gen-class))
 
 (defn -main
-  "Cljviz turns clj-kondo analysis output to visul diagram. First input argument clj-file or directory, second output type (pl or gv), output is string presentation of chosen output type."
+  "Cljviz turns clj-kondo analysis output to visul diagram.
+   First input argument clj-file or directory,
+   second optional output type (pl or gv),
+   output is string presentation of chosen output type."
   [& args]
   (let [f (first args)
         o (second args)]

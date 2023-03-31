@@ -4,7 +4,10 @@
                                        filter-var-def-keys m-wonky-hash rand-color]]
             [clojure.string :as string]))
 
-(defn create-plantuml-object "Create plantuml object from a map M :name, :defined-by and :ns key" [m]
+(defn create-plantuml-object 
+  "Create plantuml object from
+   a map M :name, :defined-by and :ns key"
+  [m]
   ;; object "ns-set <<clojure.core/def>>" as object_ns_set_clojure_core_def {
   ;; dummy is a very long text 1 
   ;; 3 4. with new lines and all
@@ -39,7 +42,10 @@
   (compare "declare" "declare"))
 
 
-(defn create-pl-ob-package "Create plantuml package section from vector V with first item :ns and second item map of vars" [v]
+(defn create-pl-ob-package 
+  "Create plantuml package section from vector V
+   with first item :ns and second item map of vars" 
+  [v]
   (let [i (name (first v))
         m (second v)]
     (str "package " i " {" "\n" (apply str (into #{} (map #(create-plantuml-object %) m))) " }" "\n")))
@@ -48,7 +54,10 @@
   (map #(create-pl-ob-package %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))))))
 
 
-(defn create-pl-links "Provides plantuml relationship section links based on map M :from-var :from :name and :to values" [m]
+(defn create-pl-links 
+  "Provides plantuml relationship section links 
+   based on map M :from-var :from :name and :to values" 
+  [m]
   (let [frnname (m :from-var)
         frnnamens (m :from)
         tn (m :name)
@@ -90,7 +99,9 @@
                      :row 115
                      :to aoc2022.aoc22-8}))
 
-(defn main-pl-writer "Main writer for plantuml output" [f]
+(defn main-pl-writer 
+  "Main writer for plantuml output" 
+  [f]
   (let [ma (:analysis (run-lint-analysis f))
         m-d (:var-definitions ma)
         m-u (:var-usages ma)]
