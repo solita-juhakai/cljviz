@@ -73,9 +73,11 @@
         tn (m :name)
         tns (m :to)]
     (when (and tn tns frnname frnnamens)
-      (let [fr (m-wonky-hash (str frnname "_" frnnamens))
-            to (m-wonky-hash (str tn "_" tns))]
-        (when (some? to) (str fr "->" to ";"))))))
+      (let [fr-name (str frnname "_" frnnamens)
+            to-name (str tn "_" tns)
+            fr (m-wonky-hash fr-name)
+            to (m-wonky-hash to-name)]
+        (when (some? to-name) (vector (sorted-map :name fr-name :hash fr) (sorted-map :name to-name :hash to)))))))
 
 (comment
   (create-dot-links '{:end-row 102,
@@ -109,6 +111,18 @@
                       :row 115
                       :to aoc2022.aoc22-8}))
 
+(defn write-edge 
+  "vector input V,
+   [[from-map {:name :hash} to-map{:name :hash}] freq]"
+  [V]
+  (let [[ft f] V
+        [from-e to-e] ft]
+    (str (:hash from-e) "->" (:hash to-e)
+         " [penwidth=" f
+         "; color=" \u0022 (rand-color) \u0022
+         "; label=" f
+         "; tooltip=" \u0022 (str (:name from-e) "->" (:name to-e)) \u0022 "] \n")))
+
 (defn main-dot-writer 
   "Main writer for graphviz output" 
   [f]
@@ -119,11 +133,10 @@
       (str "digraph " (graph-escape (last (string/split f #"/"))) "{\nrankdir="\u0022"TB"\u0022
            (apply str (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys m-d))))
       ;    edge [penwidth=1; color="#40e0d0"] node1 -> node2
-      ;    TO-DO use thread-macro
+      ;    TO-DO use thread-macro (or rewrite)
            (apply str
-                  (map #(str "edge [penwidth=" (second %) "; color=" \u0022 (rand-color) \u0022 ";" "label=" (second %) "] " (first %))
+                  (map #(write-edge %)
                        (frequencies
                         (filter identity (map #(create-dot-links %)
                                               (filter identity (map #(filter-usage-var-defs % m-d) m-u)))))))
            (str "}\n")))))
-
