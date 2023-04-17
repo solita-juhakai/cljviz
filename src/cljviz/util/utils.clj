@@ -13,8 +13,9 @@
 
 (defn wonky-hash 
   "Makes a string hash of input string.
-   If result's first chr is '-' replace with A " [i]
-  (string/replace (str (.hashCode i)) #"^-" "A"))
+   If result's first chr is '-' replace with A "
+  [i]
+  (string/replace (str (hash i)) #"^-" "A"))
 
 (def m-wonky-hash "memoize wonky-hash" (memoize wonky-hash))
 

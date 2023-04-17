@@ -5,7 +5,7 @@
 
 (defn handler [request]
   {:status 200
-   :headers {"Content-Type" "image/svg+xml" "Vary" "Accept-Encoding"}
+   :headers {"Content-Type" "image/svg+xml" "Vary" "Accept-Encoding" "Access-Control-Allow-Origin" "*"}
 ;;   :body (:out create-svg (main-dot-writer f))})
    })
 

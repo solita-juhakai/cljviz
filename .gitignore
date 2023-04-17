@@ -16,3 +16,5 @@ pom.xml.asc
 .cpcache/
 /tmp
 /test-data
+/.idea
+*.iml
