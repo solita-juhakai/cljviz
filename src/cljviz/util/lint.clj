@@ -1,7 +1,10 @@
 (ns cljviz.util.lint
   (:require [clj-kondo.core :as kondo]))
 
-(defn run-lint-analysis "runs clj-kondo linter with analysis on file or dir F, see https://github.com/clj-kondo/clj-kondo/tree/master/analysis" [f]
+(defn run-lint-analysis 
+  "runs clj-kondo linter with analysis on file or dir F,
+   see https://github.com/clj-kondo/clj-kondo/tree/master/analysis"
+  [f]
   (kondo/run! {:lint (list f)
                :config {:analysis true
                         :output {:format :edn}}}))

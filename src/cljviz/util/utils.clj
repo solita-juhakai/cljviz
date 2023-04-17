@@ -2,15 +2,20 @@
   (:require [cljviz.util.lint :refer [run-lint-analysis]]
             [clojure.string :as string]))
 
-(defn filter-var-def-keys "Filter :ns :name :defined-by :doc fields from lint analysis :var-definitions map M" [m]
+(defn filter-var-def-keys 
+  "Filter :ns :name :defined-by :doc fields
+   from lint analysis :var-definitions map M" [m]
   (map #(select-keys % [:ns :name :defined-by :doc]) m))
 
 (comment
   (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
 
 
-(defn wonky-hash "Makes a string hash of input string. If result's first chr is '-' replace with A " [i]
-  (string/replace (str (.hashCode i)) #"^-" "A"))
+(defn wonky-hash 
+  "Makes a string hash of input string.
+   If result's first chr is '-' replace with A "
+  [i]
+  (string/replace (str (hash i)) #"^-" "A"))
 
 (def m-wonky-hash "memoize wonky-hash" (memoize wonky-hash))
 
@@ -18,13 +23,17 @@
   (wonky-hash "read_input_clojure_core_defn")
   (m-wonky-hash "read_input_clojure_core_defn"))
 
-(defn multi-pred "filter items from COLL with M key value pairs" [coll m]
+(defn multi-pred
+  "filter items from COLL with M key value pairs" [coll m]
   ;; select elements using reduce-kv & filter
   ;; https://clojuredocs.org/clojure.core/reduce-kv
   (reduce-kv
    (fn [erg k v] (filter #(= v (k %)) erg)) coll m))
 
-(defn filter-usage-var-defs "filter maps from :var-usages that have both (and :from :from-var) (and :ns :to) in :var-definitions m-d" [m m-d]
+(defn filter-usage-var-defs 
+  "filter maps from :var-usages that have both 
+   (and :from :from-var) (and :ns :to) in :var-definitions m-d"
+  [m m-d]
   (let [a (multi-pred m-d {:name (m :from-var) :ns (m :from)})
         b (multi-pred m-d {:name (m :name) :ns (m :to)})]
     (when (and (when (seq a) a) (when (seq b) b)) m)))
@@ -52,10 +61,14 @@
                 :to cljviz.core})
   (filter-usage-var-defs test-m v-d))
 
-(defn rand-hex "Creates random 2 hex digits, pad with zero" []
+(defn rand-hex 
+  "Creates random 2 hex digits, pad with zero"
+  []
   (string/replace (format "%2S" (Integer/toHexString (rand-int 256))) #"[ ]" "0"))
 
-(defn rand-color "Creates random 6 digit hex color code" []
+(defn rand-color
+  "Creates random 6 digit hex color code"
+  []
   (str "#" (string/join (repeatedly 3 rand-hex))))
 
 (comment
@@ -86,7 +99,9 @@
   )
 
 
-(defn graph-escape "escapes graph chars for string S" [s]
+(defn graph-escape 
+  "escapes graph chars for string S"
+  [s]
   (-> s
       (string/replace #"\." "_")
       (string/replace "-" "_")))
@@ -94,3 +109,10 @@
 (comment
   (graph-escape "...--test--te")
   )
+
+(defn br-align
+  "replace newlines in string S
+   with <BR ALIGN=LEFT></BR>"
+  [s]
+  (-> s
+   (string/replace "\n" "<BR ALIGN=\"LEFT\"></BR>")))

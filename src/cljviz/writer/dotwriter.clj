@@ -1,8 +1,8 @@
 (ns cljviz.writer.dotwriter 
   (:require [cljviz.util.lint :refer [run-lint-analysis]]
-            [cljviz.util.utils :refer [filter-usage-var-defs
-                                       filter-var-def-keys graph-escape
-                                       m-wonky-hash rand-color xml-escape]]
+            [cljviz.util.utils :refer [br-align filter-usage-var-defs
+                                       filter-var-def-keys graph-escape m-wonky-hash
+                                       rand-color xml-escape]]
             [clojure.string :as string]))
 
 (defn create-dot-node "Create dot node from a map M :name, :defined-by and :ns key" [m]
@@ -22,7 +22,7 @@
 ;           "rankdir=" \u0022 "LR" \u0022 "\n"
            ;"label=" \u0022 "{" (xml-escape node) "|"(when doc (label-escape doc)) "|}" \u0022 "\n"
            "shape=plaintext\n"
-           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow"\u0022 " CELLSPACING="\u0022"0"\u0022"><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when doc (xml-escape doc)) "</TD></TR></TABLE>>\n"
+           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow"\u0022 " CELLSPACING="\u0022"0"\u0022"><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when doc (br-align (xml-escape doc))) "</TD></TR></TABLE>>\n"
 ;           "style=filled\n"
 ;           "fillcolor=lightyellow\n"
            "];\n"))))
@@ -49,7 +49,10 @@
   (compare "declare" "declare"))
   
 
-(defn create-dot-subgraph "Create dot subgraph from vector V with first :ns and second map of vars" [v]
+(defn create-dot-subgraph
+  "Create dot subgraph from vector V
+   with first :ns and second map of vars"
+  [v]
   (let [i (name (first v))
         ri (graph-escape i)
         m (second v)]
@@ -61,15 +64,20 @@
   (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))))))
 
 
-(defn create-dot-links "Provides dot relationship section links based on map M :from-var :from :name and :to values" [m]
+(defn create-dot-links 
+  "Provides dot relationship section links
+   based on map M :from-var :from :name and :to values"
+  [m]
   (let [frnname (m :from-var)
         frnnamens (m :from)
         tn (m :name)
         tns (m :to)]
     (when (and tn tns frnname frnnamens)
-      (let [fr (m-wonky-hash (str frnname "_" frnnamens))
-            to (m-wonky-hash (str tn "_" tns))]
-        (when (some? to) (str fr "->" to ";"))))))
+      (let [fr-name (str frnname "_" frnnamens)
+            to-name (str tn "_" tns)
+            fr (m-wonky-hash fr-name)
+            to (m-wonky-hash to-name)]
+        (when (some? to-name) (vector (sorted-map :name fr-name :hash fr) (sorted-map :name to-name :hash to)))))))
 
 (comment
   (create-dot-links '{:end-row 102,
@@ -103,19 +111,32 @@
                       :row 115
                       :to aoc2022.aoc22-8}))
 
-(defn main-dot-writer "Main writer for graphviz output" [f]
+(defn write-edge 
+  "vector input V,
+   [[from-map {:name :hash} to-map{:name :hash}] freq]"
+  [V]
+  (let [[ft f] V
+        [from-e to-e] ft]
+    (str (:hash from-e) "->" (:hash to-e)
+         " [penwidth=" f
+         "; color=" \u0022 (rand-color) \u0022
+         "; label=" f
+         "; tooltip=" \u0022 (str (:name from-e) "->" (:name to-e)) \u0022 "] \n")))
+
+(defn main-dot-writer 
+  "Main writer for graphviz output" 
+  [f]
   (let [ma (:analysis (run-lint-analysis f))
         m-d (:var-definitions ma)
         m-u (:var-usages ma)]
     (do
-      (str "digraph " (graph-escape (last (string/split f #"/"))) "{\n"
+      (str "digraph " (graph-escape (last (string/split f #"/"))) "{\nrankdir="\u0022"TB"\u0022
            (apply str (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys m-d))))
       ;    edge [penwidth=1; color="#40e0d0"] node1 -> node2
-      ;    TO-DO use thread-macro
+      ;    TO-DO use thread-macro (or rewrite)
            (apply str
-                  (map #(str "edge [penwidth=" (second %) "; color=" \u0022 (rand-color) \u0022 ";" "label=" (second %) "] " (first %))
+                  (map #(write-edge %)
                        (frequencies
                         (filter identity (map #(create-dot-links %)
                                               (filter identity (map #(filter-usage-var-defs % m-d) m-u)))))))
            (str "}\n")))))
-
