@@ -2,6 +2,7 @@
   (:require [cljviz.util.http :refer [start-http]]
             [cljviz.util.lint :refer [run-lint-analysis]]
             [cljviz.util.utils :refer [filter-usage-var-defs]]
+            [cljviz.util.alephws :refer [start-websocket-server]]
             [cljviz.writer.dotwriter :refer [main-dot-writer]]
             [cljviz.writer.plwriter :refer [main-pl-writer]]
             [clojure.string :as string])
@@ -22,6 +23,7 @@
       (cond
         (= o "pl") (main-pl-writer f)
         (= o "gv") (println (main-dot-writer f))
+        (= o "ws") (start-websocket-server 3000)
         :else (start-http f))
       (println "Need an input clj-file or directory"))))
 
