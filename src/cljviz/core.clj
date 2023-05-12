@@ -1,8 +1,8 @@
 (ns cljviz.core
-  (:require [cljviz.util.http :refer [start-http]]
+  (:require [cljviz.util.alephws :refer [start-ws watch-src]]
+            [cljviz.util.http :refer [start-http]]
             [cljviz.util.lint :refer [run-lint-analysis]]
             [cljviz.util.utils :refer [filter-usage-var-defs]]
-            [cljviz.util.alephws :refer [start-ws]]
             [cljviz.writer.dotwriter :refer [main-dot-writer]]
             [cljviz.writer.plwriter :refer [main-pl-writer]]
             [clojure.string :as string])
@@ -23,7 +23,8 @@
       (cond
         (= o "pl") (main-pl-writer f)
         (= o "gv") (println (main-dot-writer f))
-        (= o "ws") (start-ws)
+        (= o "ws") ((start-ws)
+                    (watch-src f))
         :else (start-http f))
       (println "Need an input clj-file or directory"))))
 
