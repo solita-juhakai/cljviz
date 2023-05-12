@@ -10,7 +10,8 @@
                  [http-kit "2.6.0"]
                  [aleph "0.6.1"]
                  [manifold "0.4.0"]
-                 [metosin/reitit "0.6.0"]]
+                 [metosin/reitit "0.6.0"]
+                 [clojure-watch "0.1.14"]]
   :main ^:skip-aot cljviz.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
