@@ -13,39 +13,37 @@
    :body "Expected a websocket request."})
 
 
-(defn start-page "handler load ui code" 
+(defn start-page "handler for loading ui code
+(https://github.com/hpcc-systems/hpcc-js-wasm)" 
   [req]
   {:status 200
    :headers {"content-type" "text/html"}
    :body "<!DOCTYPE html>
-<html>
-  <body>
-    <script src=\"https://github.com/mdaines/viz.js/releases/download/v2.1.2/viz.js\"></script>
-    <script src=\"https://github.com/mdaines/viz.js/releases/download/v2.1.2/full.render.js\"></script>
-    <div id=\"output\"></div>
-    <script>
-      const eventSource = new WebSocket('ws://localhost:3000/ws');
-      const viz = new Viz();
-      const theDiv = document.getElementById('output');
-      let dot_string = '';
-      
-      eventSource.onmessage = event => {
-        dot_string = event.data;
-        console.log(\"got dot-string: \" + dot_string.length)
+  <html>
+    <body>
+          
+                    <div id=\"placeholder\">
+          </div>
+    <script type=\"module\">
+    import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
 
-        viz.renderSVGElement(dot_string)
-        .then(element => {
-            theDiv.innerHTML = '';
-            theDiv.appendChild(element);
-        })
-        .catch(error => {
-          console.error(\"Error from viz renderer: \" + error)
-          theDiv.innerHTML = 'Could not create svg from dot'
-        })
-      };
-    </script>
-  </body>
-</html>"}
+    const graphviz = await Graphviz.load();
+    const eventSource = new WebSocket('ws://localhost:3000/ws');
+    let dot_string = '';  
+    eventSource.onmessage = event => {
+      dot_string = event.data;
+      console.log(\"got dot-string: \" + dot_string.length)
+      const svg = graphviz.dot(dot_string);
+      const div = document.getElementById(\"placeholder\");
+              div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
+     }
+          </script>
+    </body>
+  </html>"}
+  )
+
+(comment
+  (defn new-test [])
   )
 
 (def conns (atom []))
@@ -91,7 +89,7 @@
   (def ts (start-ws))
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
-  (def new-tasaus (start-ws))
+  (def new-tsaus (start-ws))
   )
 
 ;; Here we `put!` ten messages to the server, and read them back again
