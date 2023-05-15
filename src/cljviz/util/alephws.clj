@@ -45,7 +45,7 @@
   (params/wrap-params
    (ring/ring-handler
     (ring/router
-     [["/ws" ws-handler]])
+     ["/ws" ws-handler])
     (ring/create-default-handler))))
 
 (defn start-ws "start websocket server" []
@@ -55,7 +55,7 @@
   (def ts (start-ws))
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
-  (def newt-tasausat (start-ws))
+  (def new-tsaus (start-ws))
   )
 
 ;; Here we `put!` ten messages to the server, and read them back again
