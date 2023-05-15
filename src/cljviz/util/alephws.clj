@@ -13,6 +13,41 @@
    :body "Expected a websocket request."})
 
 
+(defn start-page "handler load ui code" 
+  [req]
+  {:status 200
+   :headers {"content-type" "text/html"}
+   :body "<!DOCTYPE html>
+<html>
+  <body>
+    <script src=\"https://github.com/mdaines/viz.js/releases/download/v2.1.2/viz.js\"></script>
+    <script src=\"https://github.com/mdaines/viz.js/releases/download/v2.1.2/full.render.js\"></script>
+    <div id=\"output\"></div>
+    <script>
+      const eventSource = new WebSocket('ws://localhost:3000/ws');
+      const viz = new Viz();
+      const theDiv = document.getElementById('output');
+      let dot_string = '';
+      
+      eventSource.onmessage = event => {
+        dot_string = event.data;
+        console.log(\"got dot-string: \" + dot_string.length)
+
+        viz.renderSVGElement(dot_string)
+        .then(element => {
+            theDiv.innerHTML = '';
+            theDiv.appendChild(element);
+        })
+        .catch(error => {
+          console.error(\"Error from viz renderer: \" + error)
+          theDiv.innerHTML = 'Could not create svg from dot'
+        })
+      };
+    </script>
+  </body>
+</html>"}
+  )
+
 (def conns (atom []))
 
 (defn ws-handler
@@ -45,7 +80,8 @@
   (params/wrap-params
    (ring/ring-handler
     (ring/router
-     ["/ws" ws-handler])
+     [["/start" start-page]
+      ["/ws" ws-handler]])
     (ring/create-default-handler))))
 
 (defn start-ws "start websocket server" []
@@ -55,7 +91,7 @@
   (def ts (start-ws))
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
-  (def new-tsaus (start-ws))
+  (def new-tasaus (start-ws))
   )
 
 ;; Here we `put!` ten messages to the server, and read them back again
