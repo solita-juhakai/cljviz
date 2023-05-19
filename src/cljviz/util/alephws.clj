@@ -14,18 +14,33 @@
    :body "Expected a websocket request."})
 
 
-(defn start-page "handler for loading ui code
+(defn start-ui "handler for loading ui code
 (https://github.com/hpcc-systems/hpcc-js-wasm)" 
-  [req f]
-  (let [dot (main-dot-writer f)
-        body (str "<!DOCTYPE html>
+  [req]
+  (let [body (str "<!DOCTYPE html>
   <html>
-    <body onload=\"get-start();\" >
-          <div>
+    <body>
+    <div>
     <button id=\"nav-toggle-button\" type=\"button\" onclick=\"toggleVisibility()\">click me </button>
     </div>
-          <div id=\"placeholder\"> " + dot + "
-          </div>
+    <div id=\"placeholder\">
+    <script type=\"module\">
+                   import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
+
+          const graphviz = await Graphviz.load();
+//const svg = graphviz.dot('digraph { a -> b }');
+          const div = document.getElementById(\"placeholder\");
+          fetch('http://localhost:3000/start')
+                .then(response => response.text())
+                .then(data => {
+                 div.innerHTML = graphviz.layout(data, \"svg\", \"dot\");
+          })
+          .catch(error => {
+             console.error(error);
+          })
+    </script>
+    </div>
+
     <script type=\"module\">
     import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
 
@@ -37,9 +52,9 @@
       console.log(\"got dot-string: \" + dot_string.length)
       const svg = graphviz.dot(dot_string);
       const div = document.getElementById(\"placeholder\");
-              div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
+      div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
      }
-          </script>
+      </script>
 
    <script>
             function toggleVisibility () {
@@ -60,15 +75,23 @@
   </html>")]
     {:status 200
      :headers {"content-type" "text/html"}
-     :body body})
-  )
+     :body body}))
+  
 
 (comment
-  (defn new-test [])
+  (defn newtest [])
+  (apply str (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
   {:text (apply str "tic" + " tac")}
   )
+  
+(defn start-dot "" [req f]
+  (let [dot (main-dot-writer f)]
+    {:status 200
+     :headers {"content-type" "text/plain"}
+     :body dot})
+    )
     
-(defn wrap-start "" [handler f]
+(defn wrap-start " " [handler f]
   (fn [req]
     (let [response (handler req f)]
       response)))
@@ -116,7 +139,8 @@
   (http/start-server (params/wrap-params
                       (ring/ring-handler
                        (ring/router
-                        [["/start" (wrap-start start-page f)]
+                        [["/ui" start-ui]
+                         ["/start" (wrap-start start-dot f)]
                          ["/ws" ws-handler]])
                        (ring/create-default-handler))) {:port 3000}))
 
@@ -124,7 +148,7 @@
   (def ts (start-ws "/home/juhakairamo/Projects/clojure/cljviz/src"))
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
-  #_(def new-tsaus (start-ws "/home/juhakairamo/Projects/clojure/cljviz/src")))
+  (def newas (start-ws "/home/juhakairamo/Projects/clojure/cljviz/src")))
   
 
 ;; Here we `put!` ten messages to the server, and read them back again
