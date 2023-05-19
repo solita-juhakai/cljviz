@@ -5,8 +5,7 @@
             [manifold.deferred :as d]
             [manifold.stream :as s]
             [reitit.ring :as ring]
-            [ring.middleware.params :as params]
-            [ring.util.response :as r]))
+            [ring.middleware.params :as params]))
 
 (def non-websocket-request
   {:status 400
@@ -23,7 +22,7 @@
     <div>
     <button id=\"nav-toggle-button\" type=\"button\" onclick=\"toggleVisibility()\">click me </button>
     </div>
-    <div id=\"placeholder\">
+    <div id=\"placeholder\"></div>
     <script type=\"module\">
                    import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
 
@@ -38,19 +37,12 @@
           .catch(error => {
              console.error(error);
           })
-    </script>
-    </div>
-
-    <script type=\"module\">
-    import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
-
-    const graphviz = await Graphviz.load();
     const eventSource = new WebSocket('ws://localhost:3000/ws');
     let dot_string = '';  
     eventSource.onmessage = event => {
       dot_string = event.data;
       console.log(\"got dot-string: \" + dot_string.length)
-      const svg = graphviz.dot(dot_string);
+//      const svg = graphviz.dot(dot_string);
       const div = document.getElementById(\"placeholder\");
       div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
      }
@@ -79,7 +71,7 @@
   
 
 (comment
-  (defn newtest [])
+  (defn neweeeetest [])
   (apply str (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
   {:text (apply str "tic" + " tac")}
   )
@@ -148,7 +140,9 @@
   (def ts (start-ws "/home/juhakairamo/Projects/clojure/cljviz/src"))
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
-  (def newas (start-ws "/home/juhakairamo/Projects/clojure/cljviz/src")))
+  (send-all (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
+    (defn newertest [])
+  )
   
 
 ;; Here we `put!` ten messages to the server, and read them back again

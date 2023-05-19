@@ -23,8 +23,8 @@
       (cond
         (= o "pl") (main-pl-writer f)
         (= o "gv") (println (main-dot-writer f))
-        (= o "ws") ((start-ws f)
-                    (watch-src f))
+        (= o "ws") (do ((start-ws f)
+                        (watch-src f)))
         :else (start-http f))
       (println "Need an input clj-file or directory"))))
 
@@ -36,5 +36,6 @@
   (-main "/home/juhakairamo/Projects/clojure/tab/src")
   (-main "./src")
   (last (string/split "c" #"/"))
+  (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (def m-d-t (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   (map #(filter-usage-var-defs % m-d-t) (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
