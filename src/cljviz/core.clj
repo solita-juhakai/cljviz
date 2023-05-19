@@ -23,7 +23,7 @@
       (cond
         (= o "pl") (main-pl-writer f)
         (= o "gv") (println (main-dot-writer f))
-        (= o "ws") (let [ts (start-ws)]
+        (= o "ws") ((start-ws f)
                     (watch-src f))
         :else (start-http f))
       (println "Need an input clj-file or directory"))))

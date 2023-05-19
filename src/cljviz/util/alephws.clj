@@ -5,7 +5,8 @@
             [manifold.deferred :as d]
             [manifold.stream :as s]
             [reitit.ring :as ring]
-            [ring.middleware.params :as params]))
+            [ring.middleware.params :as params]
+            [ring.util.response :as r]))
 
 (def non-websocket-request
   {:status 400
@@ -15,14 +16,15 @@
 
 (defn start-page "handler for loading ui code
 (https://github.com/hpcc-systems/hpcc-js-wasm)" 
-  [req]
-  {:status 200
-   :headers {"content-type" "text/html"}
-   :body "<!DOCTYPE html>
+  [req f]
+  (let [dot (main-dot-writer f)
+        body (str "<!DOCTYPE html>
   <html>
-    <body>
-          
-                    <div id=\"placeholder\">
+    <body onload=\"get-start();\" >
+          <div>
+    <button id=\"nav-toggle-button\" type=\"button\" onclick=\"toggleVisibility()\">click me </button>
+    </div>
+          <div id=\"placeholder\"> " + dot + "
           </div>
     <script type=\"module\">
     import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
@@ -38,13 +40,38 @@
               div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
      }
           </script>
+
+   <script>
+            function toggleVisibility () {
+                var elems = document.getElementsByClassName(\"node\");
+                console.log(elems);
+                [].forEach.call(elems, function(a){
+                    console.log(a.getElementsByTagName(\"polygon\"));
+                    const polygon = a.getElementsByTagName(\"polygon\")[0];
+//                    [].forEach.call(polygons, function(b){
+//                        b.setAttribute(visibility,\"hidden\");
+                        console.log(polygon.attributes);
+                        polygon.setAttribute(\"visibility\", \"hidden\");
+//                   });
+                });
+            }
+          </script> 
     </body>
-  </html>"}
+  </html>")]
+    {:status 200
+     :headers {"content-type" "text/html"}
+     :body body})
   )
 
 (comment
   (defn new-test [])
+  {:text (apply str "tic" + " tac")}
   )
+    
+(defn wrap-start "" [handler f]
+  (fn [req]
+    (let [response (handler req f)]
+      response)))
 
 (def conns (atom []))
 
@@ -57,8 +84,9 @@
                 non-websocket-request
                 (d/let-flow [] (
                                 (swap! conns conj conn)
-                                (s/connect conn conn)
-                                )nil))))
+;;                                (s/put! conn (main-dot-writer f))
+                                (s/connect conn conn))
+                               nil))))
 
 (defn send-all "send msg to all ws channels" [msg]
   (doseq [conn @conns]
@@ -74,23 +102,30 @@
                    :callback (fn [ev f] (w-send-all ev f d))
                    :options {:recursive true}}]))
 
-(def handler
-  (params/wrap-params
-   (ring/ring-handler
-    (ring/router
-     [["/start" start-page]
-      ["/ws" ws-handler]])
-    (ring/create-default-handler))))
+;; (def handler
+;;   (params/wrap-params
+;;    (ring/ring-handler
+;;     (ring/router
+;;      [["/start" start-page]
+;;       ["/ws" ws-handler]])
+;;     (ring/create-default-handler))))
 
-(defn start-ws "start websocket server" []
-  (http/start-server handler {:port 3000}))
+(defn start-ws
+  "start websocket server" 
+  [f]
+  (http/start-server (params/wrap-params
+                      (ring/ring-handler
+                       (ring/router
+                        [["/start" (wrap-start start-page f)]
+                         ["/ws" ws-handler]])
+                       (ring/create-default-handler))) {:port 3000}))
 
 (comment
-  (def ts (start-ws))
+  (def ts (start-ws "/home/juhakairamo/Projects/clojure/cljviz/src"))
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
-  (def new-tsaus (start-ws))
-  )
+  #_(def new-tsaus (start-ws "/home/juhakairamo/Projects/clojure/cljviz/src")))
+  
 
 ;; Here we `put!` ten messages to the server, and read them back again
 ;; (let [conn @(http/websocket-client "ws://localhost:10000/echo")]
