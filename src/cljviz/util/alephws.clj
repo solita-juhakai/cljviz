@@ -19,9 +19,6 @@ using (https://github.com/hpcc-systems/hpcc-js-wasm)"
   (let [body (str "<!DOCTYPE html>
   <html>
     <body>
-    <div>
-    <button id=\"nav-toggle-button\" type=\"button\" onclick=\"toggleVisibility()\">click me </button>
-    </div>
     <div id=\"placeholder\"></div>
     <script type=\"module\">
       import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
@@ -46,21 +43,6 @@ using (https://github.com/hpcc-systems/hpcc-js-wasm)"
         div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
       }
     </script>
-   <script>
-            function toggleVisibility () {
-                var elems = document.getElementsByClassName(\"node\");
-                console.log(elems);
-                [].forEach.call(elems, function(a){
-                    console.log(a.getElementsByTagName(\"polygon\"));
-                    const polygon = a.getElementsByTagName(\"polygon\")[0];
-//                    [].forEach.call(polygons, function(b){
-//                        b.setAttribute(visibility,\"hidden\");
-                        console.log(polygon.attributes);
-                        polygon.setAttribute(\"visibility\", \"hidden\");
-//                   });
-                });
-            }
-          </script> 
     </body>
   </html>")]
     {:status 200
