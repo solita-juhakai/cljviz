@@ -7,7 +7,7 @@
                  [org.clojure/test.check "1.1.1"]
                  [clj-kondo "2022.12.11-SNAPSHOT"]
                  [ring/ring "1.9.6"]
-                 [http-kit "2.6.0"]
+;;                 [http-kit "2.6.0"]
                  [aleph "0.6.1"]
                  [manifold "0.4.0"]
                  [metosin/reitit "0.6.0"]

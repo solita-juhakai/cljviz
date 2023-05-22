@@ -42,7 +42,6 @@
     eventSource.onmessage = event => {
       dot_string = event.data;
       console.log(\"got dot-string: \" + dot_string.length)
-//      const svg = graphviz.dot(dot_string);
       const div = document.getElementById(\"placeholder\");
       div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
      }
@@ -71,9 +70,8 @@
   
 
 (comment
-  (defn neweeeetest [])
+  (defn newetest [])
   (apply str (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
-  {:text (apply str "tic" + " tac")}
   )
   
 (defn start-dot "" [req f]
@@ -88,7 +86,7 @@
     (let [response (handler req f)]
       response)))
 
-(def conns (atom []))
+(def conns (atom #{}))
 
 (defn ws-handler
   [req]
@@ -97,11 +95,10 @@
                      (fn [_] nil))]
               (if-not conn
                 non-websocket-request
-                (d/let-flow [] (
-                                (swap! conns conj conn)
-;;                                (s/put! conn (main-dot-writer f))
-                                (s/connect conn conn))
-                               nil))))
+                ;;(d/let-flow []
+                            ((swap! conns conj conn)
+                                (s/connect conn conn)))
+                               nil))
 
 (defn send-all "send msg to all ws channels" [msg]
   (doseq [conn @conns]
@@ -141,7 +138,7 @@
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
   (send-all (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
-    (defn newertest [])
+    (defn newereertest [])
   )
   
 
