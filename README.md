@@ -2,7 +2,7 @@
 
 Cljviz turns your clojure project's clj-kondo analysis output to visual diagram.
 
-
+![generated image](cljviz.svg)
 >**NOTE**
 >cljviz is **alpha** code and made as a clojure learning project. 
 
@@ -18,7 +18,7 @@ Input arguments for cljviz are clj-file or source directory and optionally outpu
 
 Change to download directory and run
 
-    $ lein run *<clojure project clj-file or src-dir>*
+    $ lein run <clojure project clj-file or src-dir>
 
 Open http://localhost:3000 with browser.
 
