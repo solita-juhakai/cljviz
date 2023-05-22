@@ -8,19 +8,30 @@ Cljviz turns your clojure project's clj-kondo analysis output to visual diagram.
 
 ## Installation
 
-Download code and see Usage. You will need [plantuml](https://plantuml.com) and/or [graphviz](https://graphviz.org) tools. Graphviz `dot`-command needs to be in PATH. Image viewer is also needed.
+Download code and see Usage/Options below.
+You will need [plantuml](https://plantuml.com) and/or [graphviz](https://graphviz.org) tools. Graphviz `dot`-command needs to be in PATH. Image viewer is also needed.
 
 ## Usage
 
-Input arguments for cljviz are clj-file or source directory and optionally output type (pl | gv). Cljviz output (stdout) is plantuml or graphviz (dot-language) description.
+Input options for cljviz are clj-file or source directory and optionally output type (`pl`) | `gv` | `ws`).
+Cljviz output (stdout) can be plantuml or graphviz (dot-language) description.
+Without options static svg diagram will be created in http://localhost:3000 and with ws option there is automatically updating diagram in http://localhost:3000/ui.
 
 ### Browser output
 
 Change to download directory and run
 
-    $ lein run *<clojure project clj-file or src-dir>*
+    $ lein run <clojure project clj-file or src-dir>
 
 Open http://localhost:3000 with browser.
+
+### Live browser output
+
+Change to download directory and run
+
+    $ lein run <clojure project clj-file or src-dir> ws
+
+Open http://localhost:3000/ui with browser. The diagram should update when vars and namespaces are updated in code.
 
 ### Plantuml output
 
@@ -48,9 +59,13 @@ Open resulting example.png image with image viewer.
 
 ## Options
 
-No other options supported at this point.
+Options cannot be combined
+- (no options): static diagram for browsing
+- pl: plantuml std output, runs and quits
+- gv: graphviz std output, runs and quits
+- ws: "live" updating diagram for browsing
 
-### Known issues
+## Known issues
 
 - Generated diagram resembles an UML class diagram, which is obviously wrong in clojure context.
 
@@ -60,13 +75,13 @@ No other options supported at this point.
 
 - Tested only in linux.
 
-### Future plans
+## Future plans
 
-- move from plantuml to plain graphviz (added)
-- generate web output for browser usage, maybe imagemap based (added basic svg)
+- move from plantuml to plain graphviz (added option)
+- generate web output for browser usage, maybe imagemap based (added basic svg and live updates)
 - proper cli arg support
 - template based output format
-- namespace only view 
+- namespace only view
 
 
 ### About clj-kondo
