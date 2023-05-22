@@ -13,8 +13,8 @@
    :body "Expected a websocket request."})
 
 
-(defn start-ui "handler for loading ui code
-(https://github.com/hpcc-systems/hpcc-js-wasm)" 
+(defn start-ui "handler for loading ui code to draw svg,
+using (https://github.com/hpcc-systems/hpcc-js-wasm)" 
   [req]
   (let [body (str "<!DOCTYPE html>
   <html>
@@ -24,29 +24,28 @@
     </div>
     <div id=\"placeholder\"></div>
     <script type=\"module\">
-                   import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
-
-          const graphviz = await Graphviz.load();
-//const svg = graphviz.dot('digraph { a -> b }');
-          const div = document.getElementById(\"placeholder\");
-          fetch('http://localhost:3000/start')
-                .then(response => response.text())
-                .then(data => {
-                 div.innerHTML = graphviz.layout(data, \"svg\", \"dot\");
-          })
-          .catch(error => {
-             console.error(error);
-          })
-    const eventSource = new WebSocket('ws://localhost:3000/ws');
-    let dot_string = '';  
-    eventSource.onmessage = event => {
-      dot_string = event.data;
-      console.log(\"got dot-string: \" + dot_string.length)
+      import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
+      const graphviz = await Graphviz.load();
+      //const svg = graphviz.dot('digraph { a -> b }');
       const div = document.getElementById(\"placeholder\");
-      div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
-     }
-      </script>
-
+        fetch('http://localhost:3000/start')
+         .then(response => response.text())
+         .then(data => {
+           div.innerHTML = graphviz.layout(data, \"svg\", \"dot\");
+         })
+        .catch(error => {
+           console.error(error);
+        })
+      
+      const eventSource = new WebSocket('ws://localhost:3000/ws');
+      let dot_string = '';  
+      eventSource.onmessage = event => {
+        dot_string = event.data;
+        console.log(\"got dot-string: \" + dot_string.length)
+        const div = document.getElementById(\"placeholder\");
+        div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
+      }
+    </script>
    <script>
             function toggleVisibility () {
                 var elems = document.getElementsByClassName(\"node\");
@@ -69,45 +68,54 @@
      :body body}))
   
 
-(comment
-  (defn newetest [])
-  (apply str (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
-  )
-  
-(defn start-dot "" [req f]
+(defn start-dot "creates start-up handler which
+returns dot format presentation of
+input clj source folder F"
+  [req f]
   (let [dot (main-dot-writer f)]
     {:status 200
      :headers {"content-type" "text/plain"}
      :body dot})
     )
     
-(defn wrap-start " " [handler f]
+(defn wrap-start "wraps ring handler HANDLER 
+to be able to pass more arguments F"
+  [handler f]
   (fn [req]
     (let [response (handler req f)]
       response)))
 
 (def conns (atom #{}))
 
-(defn ws-handler
+(defn ws-handler 
+  "websocket handler, storing connections to atom conns"
   [req]
   (d/let-flow [conn (d/catch
                      (http/websocket-connection req)
                      (fn [_] nil))]
               (if-not conn
                 non-websocket-request
-                ;;(d/let-flow []
-                            ((swap! conns conj conn)
-                                (s/connect conn conn)))
-                               nil))
+                ((swap! conns conj conn)
+                 (s/connect conn conn)))
+              nil))
 
-(defn send-all "send msg to all ws channels" [msg]
+(defn send-all
+  "send msg  MSG to all ws channels
+based on atom conns"
+  [msg]
   (doseq [conn @conns]
     (s/put! conn msg)))
 
-(defn w-send-all "send-all wrapper" [_ _ d]
+(defn w-send-all
+  "wrapper for send-all to send
+dot updates to connections in conns"
+  [_ _ d]
   (send-all (main-dot-writer d)))
 
-(defn watch-src "watches changes in src dir D" [d]
+(defn watch-src
+  "watches changes in src dir D
+and sends dot updates to channels"
+  [d]
   (w/start-watch [{:path d
                    :event-types [:create :modify :delete]
                    :bootstrap (fn [d] (send-all (main-dot-writer d)))
@@ -138,37 +146,4 @@
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
   (send-all (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
-    (defn newereertest [])
   )
-  
-
-;; Here we `put!` ten messages to the server, and read them back again
-;; (let [conn @(http/websocket-client "ws://localhost:10000/echo")]
-
-;;   (s/put-all! conn
-;;               (->> 10 range (map str)))
-
-;;   (->> conn
-;;        (s/transform (take 10))
-;;        s/stream->seq
-;;        doall))    ;=> ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")
-
-;; ;; Here we create two clients, and have them speak to each other
-;; (let [conn1 @(http/websocket-client "ws://localhost:10000/chat")
-;;       conn2 @(http/websocket-client "ws://localhost:10000/chat")]
-
-;;   ;; sign our two users in
-;;   (s/put-all! conn1 ["shoes and ships" "Alice"])
-;;   (s/put-all! conn2 ["shoes and ships" "Bob"])
-
-;;   (s/put! conn1 "hello")
-
-;;   (println @(s/take! conn1))                                  ;=> "Alice: hello"
-;;   (println @(s/take! conn2))                                  ;=> "Alice: hello"
-
-;;   (s/put! conn2 "hi!")
-
-;;   (println @(s/take! conn1))                                  ;=> "Bob: hi!"
-;;   (println @(s/take! conn2)))                                 ;=> "Bob: hi!"
-
-;;(.close s)
