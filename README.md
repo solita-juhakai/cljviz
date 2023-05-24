@@ -17,21 +17,21 @@ Input options for cljviz are clj-file or source directory and optionally output 
 Cljviz output (stdout) can be plantuml or graphviz (dot-language) description.
 Without options static svg diagram will be created in http://localhost:3000 and with ws option there is automatically updating diagram in http://localhost:3000/ui.
 
-### Browser output
+### Browser output (static)
 
 Change to download directory and run
 
     $ lein run <clojure project clj-file or src-dir>
 
-Open http://localhost:3000 with browser.
+Open http://localhost:3000 with browser. The diagram is based on code state at the moment of starting cljviz. 
 
-### Live browser output
+### Browser output (live)
 
 Change to download directory and run
 
     $ lein run <clojure project clj-file or src-dir> ws
 
-Open http://localhost:3000/ui with browser. The diagram should update when vars and namespaces are updated in code.
+Open http://localhost:3000/ui with browser. The diagram should update when vars and namespaces are updated in code repo cljviz is watching.
 
 ### Plantuml output
 
