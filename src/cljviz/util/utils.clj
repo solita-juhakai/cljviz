@@ -1,5 +1,5 @@
 (ns cljviz.util.utils 
-  (:require [cljviz.util.lint :refer [run-lint-analysis]]
+  (:require [cljviz.util.lint :refer [run-lint-analysis run-ns-analysis]]
             [clojure.string :as string]))
 
 (defn filter-var-def-keys 
@@ -32,7 +32,7 @@
 
 (defn filter-usage-var-defs 
   "filter maps from :var-usages that have both 
-   (and :from :from-var) (and :ns :to) in :var-definitions m-d"
+   (and :from :from-var) (and :to :ns) in :var-definitions m-d"
   [m m-d]
   (let [a (multi-pred m-d {:name (m :from-var) :ns (m :from)})
         b (multi-pred m-d {:name (m :name) :ns (m :to)})]
@@ -60,6 +60,37 @@
                 :row 37
                 :to cljviz.core})
   (filter-usage-var-defs test-m v-d))
+
+(defn filter-usage-ns-defs
+  "filter maps M from :namespace-usages that have both
+   :from :to keys in :namespace-definitions"
+  [m n-d]
+  (let [a (multi-pred n-d {:name (m :from)})
+        b (multi-pred n-d {:name (m :to)})]
+    (when (and (when (seq a) a) (when (seq b) b)) m)))
+
+(comment
+  (def n-d (:namespace-definitions (:analysis (run-ns-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/"))))
+  (n-d)
+  (def n-u (:namespace-usages (:analysis (run-ns-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/"))))
+  (def test-ns '  {:alias string
+                   :alias-col 33
+                   :alias-end-col 39
+                   :alias-end-row 3
+                   :alias-row 3
+                   :col 14
+                   :filename
+                   "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/util/utils.clj"
+                   :from cljviz.util.utils
+                   :name-col 14
+                   :name-end-col 28
+                   :name-end-row 3
+                   :name-row 3
+                   :row 3
+                   :to clojure.string})
+  (filter-usage-ns-defs test-ns n-d)
+  )
+
 
 (defn rand-hex 
   "Creates random 2 hex digits, pad with zero"
