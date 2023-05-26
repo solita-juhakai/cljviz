@@ -5,7 +5,8 @@
             [manifold.deferred :as d]
             [manifold.stream :as s]
             [reitit.ring :as ring]
-            [ring.middleware.params :as params]))
+            [ring.middleware.params :as params]
+            [hiccup.core :as h]))
 
 (def non-websocket-request
   {:status 400
@@ -16,13 +17,15 @@
 (defn start-ui "handler for loading ui code to draw svg,
 using (https://github.com/hpcc-systems/hpcc-js-wasm)" 
   [req]
-  (let [body (str "<!DOCTYPE html>
-  <html>
-    <body>
-    <div id=\"nsplace\"></div>
-    <div id=\"placeholder\"></div>
-    <script type=\"module\">
-      import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
+  (let [body (h/html
+               [:body
+                [:details
+                 [:summary
+                  [:div#nsplace]]
+                 [:div#placeholder]
+                 ]
+                [:script {:type :module}
+                 "import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
       const graphviz = await Graphviz.load();
       //const svg = graphviz.dot('digraph { a -> b }');
       var div = document.getElementById(\"placeholder\");
@@ -53,10 +56,7 @@ using (https://github.com/hpcc-systems/hpcc-js-wasm)"
         console.log(\"got dot-string: \" + dot_string.length)
         const div = document.getElementById(\"placeholder\");
         div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
-      };
-    </script>
-    </body>
-  </html>")]
+      };"]])]
     {:status 200
      :headers {"content-type" "text/html"}
      :body body}))
