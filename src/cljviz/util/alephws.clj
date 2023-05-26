@@ -1,11 +1,12 @@
 (ns cljviz.util.alephws
   (:require [aleph.http :as http]
-            [cljviz.writer.dotwriter :refer [main-dot-writer]]
+            [cljviz.writer.dotwriter :refer [main-dot-writer ns-dot-writer]]
             [clojure-watch.core :as w]
             [manifold.deferred :as d]
             [manifold.stream :as s]
             [reitit.ring :as ring]
-            [ring.middleware.params :as params]))
+            [ring.middleware.params :as params]
+            [hiccup.core :as h]))
 
 (def non-websocket-request
   {:status 400
@@ -16,19 +17,34 @@
 (defn start-ui "handler for loading ui code to draw svg,
 using (https://github.com/hpcc-systems/hpcc-js-wasm)" 
   [req]
-  (let [body (str "<!DOCTYPE html>
-  <html>
-    <body>
-    <div id=\"placeholder\"></div>
-    <script type=\"module\">
-      import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
+  (let [body (h/html
+               [:body
+                [:details
+                 [:summary
+                  [:h2 "Namespace view, click to toggle full var view"]
+                  [:div#nsplace]]
+                 [:div#placeholder]
+                 ]
+                [:script {:type :module}
+                 "import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
       const graphviz = await Graphviz.load();
       //const svg = graphviz.dot('digraph { a -> b }');
-      const div = document.getElementById(\"placeholder\");
-        fetch('http://localhost:3000/start')
+      var div = document.getElementById(\"placeholder\");
+        fetch('/start')
          .then(response => response.text())
          .then(data => {
            div.innerHTML = graphviz.layout(data, \"svg\", \"dot\");
+         })
+        .catch(error => {
+           console.error(error);
+        })
+                   
+
+      var nsdiv = document.getElementById(\"nsplace\");
+        fetch('/ns')
+         .then(response => response.text())
+         .then(data => {
+           nsdiv.innerHTML = graphviz.layout(data, \"svg\", \"dot\");
          })
         .catch(error => {
            console.error(error);
@@ -41,10 +57,7 @@ using (https://github.com/hpcc-systems/hpcc-js-wasm)"
         console.log(\"got dot-string: \" + dot_string.length)
         const div = document.getElementById(\"placeholder\");
         div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
-      }
-    </script>
-    </body>
-  </html>")]
+      };"]])]
     {:status 200
      :headers {"content-type" "text/html"}
      :body body}))
@@ -59,7 +72,16 @@ input clj source folder F"
      :headers {"content-type" "text/plain"}
      :body dot})
     )
-    
+
+(defn start-ns-dot "creates start-up handler which
+returns dot format presentation (ns-view) of
+input clj source folder F"
+  [req f]
+  (let [dot (ns-dot-writer f)]
+    {:status 200
+     :headers {"content-type" "text/plain"}
+     :body dot}))
+
 (defn wrap-start "wraps ring handler HANDLER 
 to be able to pass more arguments F"
   [handler f]
@@ -120,7 +142,8 @@ and sends dot updates to channels"
                        (ring/router
                         [["/ui" start-ui]
                          ["/start" (wrap-start start-dot f)]
-                         ["/ws" ws-handler]])
+                         ["/ws" ws-handler]
+                         ["/ns" (wrap-start start-ns-dot f)]])
                        (ring/create-default-handler))) {:port 3000}))
 
 (comment
@@ -128,4 +151,5 @@ and sends dot updates to channels"
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
   (send-all (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
+  (def demo "")
   )

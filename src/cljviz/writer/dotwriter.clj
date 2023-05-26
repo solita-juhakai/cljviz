@@ -1,11 +1,13 @@
-(ns cljviz.writer.dotwriter 
-  (:require [cljviz.util.lint :refer [run-lint-analysis]]
-            [cljviz.util.utils :refer [br-align filter-usage-var-defs
-                                       filter-var-def-keys graph-escape m-wonky-hash
-                                       rand-color xml-escape]]
+(ns cljviz.writer.dotwriter "ns test doc-string" 
+  (:require [cljviz.util.lint :refer [run-lint-analysis run-ns-analysis]]
+            [cljviz.util.utils :refer [br-align filter-usage-ns-defs
+                                       filter-usage-var-defs filter-var-def-keys
+                                       graph-escape m-wonky-hash rand-color xml-escape]]
             [clojure.string :as string]))
 
-(defn create-dot-node "Create dot node from a map M :name, :defined-by and :ns key" [m]
+(defn create-dot-node
+  "Create dot node from a map M :name, :defined-by and :ns key"
+  [m]
   ;; object "ns-set <<clojure.core/def>>" as object_ns_set_clojure_core_def {
   ;; dummy is a very long text 1 
   ;; 3 4. with new lines and all
@@ -47,7 +49,44 @@
              :row 16})
   (m-wonky-hash (str (t-m :name) "_" (t-m :ns)))
   (compare "declare" "declare"))
-  
+
+(defn create-ns-dot-node
+  "Create dot node from namespace-definitions analysis map M"
+  [m]
+  (let [dn (str (m :name))
+        pi (m-wonky-hash dn)
+        doc (m :doc)]
+    (str pi
+         "[\n"
+         "id=" pi "\n"
+         "label=" \u0022 (xml-escape dn) (when doc (str "\ndoc: " (xml-escape doc) "\n")) \u0022
+         "];\n")))
+
+(comment
+  (create-ns-dot-node '{:col 1
+                        :doc "ns test doc-string"
+                        :end-col 42
+                        :end-row 6
+                        :filename
+                        "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/writer/dotwriter.clj"
+                        :name cljviz.writer.dotwriter
+                        :name-col 5
+                        :name-end-col 28
+                        :name-end-row 1
+                        :name-row 1
+                        :row 1})
+  (create-ns-dot-node '  {:col 1
+                          :end-col 50
+                          :end-row 8
+                          :filename
+                          "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/util/alephws.clj"
+                          :name cljviz.util.alephws
+                          :name-col 5
+                          :name-end-col 24
+                          :name-end-row 1
+                          :name-row 1
+                          :row 1})
+  )
 
 (defn create-dot-subgraph
   "Create dot subgraph from vector V
@@ -111,7 +150,17 @@
                       :row 115
                       :to aoc2022.aoc22-8}))
 
-(defn write-edge 
+(defn create-ns-dot-links
+  "Provides dot relationship section links
+   based on map M :from and :to values"  [m]
+  (let [frnnamens (m :from)
+        tons (m :to)]
+    (when (and tons frnnamens)
+      (let  [fr (m-wonky-hash (str frnnamens))
+             to (m-wonky-hash (str tons))]
+        (when (some? to) (vector (sorted-map :name frnnamens :hash fr) (sorted-map :name tons :hash to)))))))
+
+(defn write-edge
   "vector input V,
    [[from-map {:name :hash} to-map{:name :hash}] freq]"
   [V]
@@ -123,6 +172,7 @@
          "; label=" f
          "; tooltip=" \u0022 (str (:name from-e) "->" (:name to-e)) \u0022 "] \n")))
 
+
 (defn main-dot-writer 
   "Main writer for graphviz output" 
   [f]
@@ -130,7 +180,8 @@
         m-d (:var-definitions ma)
         m-u (:var-usages ma)]
     (do
-      (str "digraph " (graph-escape (last (string/split f #"/"))) "{\nrankdir="\u0022"TB"\u0022
+      (str "digraph " (graph-escape (last (string/split f #"/")))
+           "{\nrankdir=" \u0022 "TB" \u0022 "\n"
            (apply str (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys m-d))))
       ;    edge [penwidth=1; color="#40e0d0"] node1 -> node2
       ;    TO-DO use thread-macro (or rewrite)
@@ -140,3 +191,31 @@
                         (filter identity (map #(create-dot-links %)
                                               (filter identity (map #(filter-usage-var-defs % m-d) m-u)))))))
            (str "}\n")))))
+
+(defn ns-dot-writer 
+  "Writer for namespace graphviz output"
+  [f]
+  (let [n-s (:analysis (run-ns-analysis f))
+        n-d (:namespace-definitions n-s)
+        n-u (:namespace-usages n-s)]
+    (do
+      (str "digraph " (graph-escape (last (string/split f #"/")))
+           "{\nrankdir=" \u0022 "TB" \u0022 "\n"
+           (apply str (map #(create-ns-dot-node %) n-d))
+           (apply str 
+                  (map #(write-edge %)
+                       (frequencies
+                        (filter identity (map #(create-ns-dot-links %)
+                                              (filter identity (map #(filter-usage-ns-defs % n-d) n-u)))))))
+           "}\n"))))
+
+(comment
+  (println (ns-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src/"))
+  (println (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src/"))
+  (def test-nd (:namespace-definitions (:analysis (run-ns-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/"))))
+  (test-nd)
+  (def test-nu (:namespace-usages  (:analysis (run-ns-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/"))))
+  (test-nu)
+  (map #(filter-usage-ns-defs % test-nd) test-nu)
+  (map #(create-dot-links %) (filter identity (map #(filter-usage-ns-defs % test-nd) test-nu)))
+  )
