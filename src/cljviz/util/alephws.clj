@@ -19,16 +19,28 @@ using (https://github.com/hpcc-systems/hpcc-js-wasm)"
   (let [body (str "<!DOCTYPE html>
   <html>
     <body>
+    <div id=\"nsplace\"></div>
     <div id=\"placeholder\"></div>
     <script type=\"module\">
       import { Graphviz } from \"https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js\";
       const graphviz = await Graphviz.load();
       //const svg = graphviz.dot('digraph { a -> b }');
-      const div = document.getElementById(\"placeholder\");
-        fetch('http://localhost:3000/start')
+      var div = document.getElementById(\"placeholder\");
+        fetch('/start')
          .then(response => response.text())
          .then(data => {
            div.innerHTML = graphviz.layout(data, \"svg\", \"dot\");
+         })
+        .catch(error => {
+           console.error(error);
+        })
+                   
+
+      var nsdiv = document.getElementById(\"nsplace\");
+        fetch('/ns')
+         .then(response => response.text())
+         .then(data => {
+           nsdiv.innerHTML = graphviz.layout(data, \"svg\", \"dot\");
          })
         .catch(error => {
            console.error(error);
@@ -41,7 +53,7 @@ using (https://github.com/hpcc-systems/hpcc-js-wasm)"
         console.log(\"got dot-string: \" + dot_string.length)
         const div = document.getElementById(\"placeholder\");
         div.innerHTML = graphviz.layout(dot_string, \"svg\", \"dot\");
-      }
+      };
     </script>
     </body>
   </html>")]
