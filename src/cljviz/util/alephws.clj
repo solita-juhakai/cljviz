@@ -21,6 +21,7 @@ using (https://github.com/hpcc-systems/hpcc-js-wasm)"
                [:body
                 [:details
                  [:summary
+                  [:h2 "Namespace view, click to toggle full var view"]
                   [:div#nsplace]]
                  [:div#placeholder]
                  ]
@@ -150,4 +151,5 @@ and sends dot updates to channels"
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (.close ts)
   (send-all (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src"))
+  (def demo "")
   )
