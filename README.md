@@ -32,6 +32,7 @@ Change to download directory and run
     $ lein run <clojure project clj-file or src-dir> ws
 
 Open http://localhost:3000/ui with browser. The diagram should update when vars and namespaces are updated in code repo cljviz is watching.
+Note that namespace view live update is WIP.
 
 ### Plantuml output
 
