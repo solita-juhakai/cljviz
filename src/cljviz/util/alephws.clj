@@ -1,6 +1,6 @@
 (ns cljviz.util.alephws
   (:require [aleph.http :as http]
-            [cljviz.writer.dotwriter :refer [main-dot-writer]]
+            [cljviz.writer.dotwriter :refer [main-dot-writer ns-dot-writer]]
             [clojure-watch.core :as w]
             [manifold.deferred :as d]
             [manifold.stream :as s]
@@ -59,7 +59,16 @@ input clj source folder F"
      :headers {"content-type" "text/plain"}
      :body dot})
     )
-    
+
+(defn start-ns-dot "creates start-up handler which
+returns dot format presentation (ns-view) of
+input clj source folder F"
+  [req f]
+  (let [dot (ns-dot-writer f)]
+    {:status 200
+     :headers {"content-type" "text/plain"}
+     :body dot}))
+
 (defn wrap-start "wraps ring handler HANDLER 
 to be able to pass more arguments F"
   [handler f]
@@ -120,7 +129,8 @@ and sends dot updates to channels"
                        (ring/router
                         [["/ui" start-ui]
                          ["/start" (wrap-start start-dot f)]
-                         ["/ws" ws-handler]])
+                         ["/ws" ws-handler]
+                         ["/ns" (wrap-start start-ns-dot f)]])
                        (ring/create-default-handler))) {:port 3000}))
 
 (comment

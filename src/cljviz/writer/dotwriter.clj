@@ -160,19 +160,18 @@
              to (m-wonky-hash (str tons))]
         (when (some? to) (vector (sorted-map :name frnnamens :hash fr) (sorted-map :name tons :hash to)))))))
 
-(defn write-edge 
+(defn write-edge
   "vector input V,
    [[from-map {:name :hash} to-map{:name :hash}] freq]"
-  ([m]
-   (write-edge m 1))
-  ([m f]
-   (let [[from-e to-e] m
-         f f]
-     (str (:hash from-e) "->" (:hash to-e)
-          " [penwidth=" f
-          "; color=" \u0022 (rand-color) \u0022
-          "; label=" f
-          "; tooltip=" \u0022 (str (:name from-e) "->" (:name to-e)) \u0022 "] \n"))))
+  [V]
+  (let [[ft f] V
+        [from-e to-e] ft]
+    (str (:hash from-e) "->" (:hash to-e)
+         " [penwidth=" f
+         "; color=" \u0022 (rand-color) \u0022
+         "; label=" f
+         "; tooltip=" \u0022 (str (:name from-e) "->" (:name to-e)) \u0022 "] \n")))
+
 
 (defn main-dot-writer 
   "Main writer for graphviz output" 
@@ -205,16 +204,18 @@
            (apply str (map #(create-ns-dot-node %) n-d))
            (apply str 
                   (map #(write-edge %)
-                       (filter identity (map #(create-ns-dot-links %)
-                                             (filter identity (map #(filter-usage-ns-defs % n-d) n-u))))))
+                       (frequencies
+                        (filter identity (map #(create-ns-dot-links %)
+                                              (filter identity (map #(filter-usage-ns-defs % n-d) n-u)))))))
            "}\n"))))
 
 (comment
   (println (ns-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src/"))
+  (println (main-dot-writer "/home/juhakairamo/Projects/clojure/cljviz/src/"))
   (def test-nd (:namespace-definitions (:analysis (run-ns-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/"))))
   (test-nd)
   (def test-nu (:namespace-usages  (:analysis (run-ns-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/"))))
-  (test-nu) 
+  (test-nu)
   (map #(filter-usage-ns-defs % test-nd) test-nu)
-  (map #(create-dot-links %)(filter identity (map #(filter-usage-ns-defs % test-nd) test-nu)))
+  (map #(create-dot-links %) (filter identity (map #(filter-usage-ns-defs % test-nd) test-nu)))
   )
