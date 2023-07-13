@@ -59,7 +59,8 @@
         doc (m :doc)]
     (str pi
          "[\n"
-         "id=" pi "\n"
+         "id=" pi "\n" 
+         "tooltip=" \u0022 dn \u0022 "\n"
          "label=" \u0022 (xml-escape dn) (when doc (str "\ndoc: " (xml-escape doc) "\n")) \u0022
          "];\n")))
 
@@ -167,12 +168,14 @@
    [[from-map {:name :ns :hash} to-map{:name :ns :hash}] freq]"
   [V]
   (let [[ft f] V
-        [from-e to-e] ft]
+        [from-e to-e] ft
+        ttip (str (:ns from-e) "\\\\" (:name from-e) " -> " (:ns to-e) "\\\\" (:name to-e))]
     (str (:hash from-e) "->" (:hash to-e)
          " [penwidth=" f
          "; color=" \u0022 (rand-color) \u0022
          "; label=" f
-         "; labeltooltip=" \u0022 (str (:ns from-e) "\\\\" (:name from-e) " -> " (:ns to-e) "\\\\" (:name to-e)) \u0022 "] \n")))
+         "; edgetooltip=" \u0022 ttip \u0022 
+         "; labeltooltip=" \u0022 ttip \u0022 "] \n")))
 
 
 (defn main-dot-writer 
