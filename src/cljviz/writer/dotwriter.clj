@@ -24,7 +24,8 @@
 ;           "rankdir=" \u0022 "LR" \u0022 "\n"
            ;"label=" \u0022 "{" (xml-escape node) "|"(when doc (label-escape doc)) "|}" \u0022 "\n"
            "shape=plaintext\n"
-           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow"\u0022 " CELLSPACING="\u0022"0"\u0022"><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when doc (br-align (xml-escape doc))) "</TD></TR></TABLE>>\n"
+           "tooltip=" \u0022 dn \u0022 "\n"
+           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow" \u0022 " CELLSPACING=" \u0022 "0" \u0022 "><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when doc (br-align (xml-escape doc))) "</TD></TR></TABLE>>\n"
 ;           "style=filled\n"
 ;           "fillcolor=lightyellow\n"
            "];\n"))))
