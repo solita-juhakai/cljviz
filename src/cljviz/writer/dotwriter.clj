@@ -24,7 +24,8 @@
 ;           "rankdir=" \u0022 "LR" \u0022 "\n"
            ;"label=" \u0022 "{" (xml-escape node) "|"(when doc (label-escape doc)) "|}" \u0022 "\n"
            "shape=plaintext\n"
-           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow"\u0022 " CELLSPACING="\u0022"0"\u0022"><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when doc (br-align (xml-escape doc))) "</TD></TR></TABLE>>\n"
+           "tooltip=" \u0022 dn \u0022 "\n"
+           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow" \u0022 " CELLSPACING=" \u0022 "0" \u0022 "><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when doc (br-align (xml-escape doc))) "</TD></TR></TABLE>>\n"
 ;           "style=filled\n"
 ;           "fillcolor=lightyellow\n"
            "];\n"))))
@@ -58,7 +59,8 @@
         doc (m :doc)]
     (str pi
          "[\n"
-         "id=" pi "\n"
+         "id=" pi "\n" 
+         "tooltip=" \u0022 dn \u0022 "\n"
          "label=" \u0022 (xml-escape dn) (when doc (str "\ndoc: " (xml-escape doc) "\n")) \u0022
          "];\n")))
 
@@ -116,7 +118,7 @@
             to-name (str tn "_" tns)
             fr (m-wonky-hash fr-name)
             to (m-wonky-hash to-name)]
-        (when (some? to-name) (vector (sorted-map :name fr-name :hash fr) (sorted-map :name to-name :hash to)))))))
+        (when (some? to-name) (vector (sorted-map :name frnname :ns frnnamens :hash fr) (sorted-map :name tn :ns tns :hash to)))))))
 
 (comment
   (create-dot-links '{:end-row 102,
@@ -161,16 +163,19 @@
         (when (some? to) (vector (sorted-map :name frnnamens :hash fr) (sorted-map :name tons :hash to)))))))
 
 (defn write-edge
-  "vector input V,
-   [[from-map {:name :hash} to-map{:name :hash}] freq]"
+  "write edges for dot presentation,
+   vector input V,
+   [[from-map {:name :ns :hash} to-map{:name :ns :hash}] freq]"
   [V]
   (let [[ft f] V
-        [from-e to-e] ft]
+        [from-e to-e] ft
+        ttip (str (:ns from-e) "\\\\" (:name from-e) " -> " (:ns to-e) "\\\\" (:name to-e))]
     (str (:hash from-e) "->" (:hash to-e)
          " [penwidth=" f
          "; color=" \u0022 (rand-color) \u0022
          "; label=" f
-         "; tooltip=" \u0022 (str (:name from-e) "->" (:name to-e)) \u0022 "] \n")))
+         "; edgetooltip=" \u0022 ttip \u0022 
+         "; labeltooltip=" \u0022 ttip \u0022 "] \n")))
 
 
 (defn main-dot-writer 
