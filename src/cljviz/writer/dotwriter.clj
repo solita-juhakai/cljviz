@@ -102,7 +102,11 @@
          "\n label=" \u0022 (xml-escape i) \u0022 "}" "\n")))
 
 (comment
-  (map #(create-dot-subgraph %) (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))))))
+  (map #(create-dot-subgraph %)
+       (group-by :ns
+                 (filter-var-def-keys
+                  (:var-definitions (:analysis
+                                     (run-lint-analysis "/home/juhakairamo/Projects/clojure/aoc2022/src")))))))
 
 
 (defn create-dot-links 
