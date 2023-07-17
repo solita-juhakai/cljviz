@@ -1,22 +1,44 @@
 # cljviz
 
-Cljviz turns your clojure project's clj-kondo analysis output to plantuml diagram.
+Cljviz turns your clojure project's clj-kondo analysis output to visual diagram.
 
-
+![generated image](cljviz.svg)
 >**NOTE**
->cljviz is **alpha** code and made by a total clojure newbie. 
+>cljviz is **alpha** code and made as a clojure learning project. 
 
 ## Installation
 
-Download code and see Usage. You will also need [plantuml](https://plantuml.com) and image viewer.
+Download code and see Usage/Options below.
+You will need [plantuml](https://plantuml.com) and/or [graphviz](https://graphviz.org) tools. Graphviz `dot`-command needs to be in PATH. Image viewer is also needed.
 
 ## Usage
 
-Only input argument for cljviz is clj-file or source directory. Cljviz output (stdout) is plantuml description.
+Input options for cljviz are clj-file or source directory and optionally output type (`pl`) | `gv` | `ws`).
+Cljviz output (stdout) can be plantuml or graphviz (dot-language) description.
+Without options static svg diagram will be created in http://localhost:3000 and with ws option there is automatically updating diagram in http://localhost:3000/ui.
+
+### Browser output (static)
 
 Change to download directory and run
 
-    $ lein run <clojure project clj-file or src-dir> > example.plantuml
+    $ lein run <clojure project clj-file or src-dir>
+
+Open http://localhost:3000 with browser. The diagram is based on code state at the moment of starting cljviz. 
+
+### Browser output (live)
+
+Change to download directory and run
+
+    $ lein run <clojure project clj-file or src-dir> ws
+
+Open http://localhost:3000/ui with browser. The diagram should update when vars and namespaces are updated in code repo cljviz is watching.
+Note that namespace view live update is WIP.
+
+### Plantuml output
+
+Change to download directory and run
+
+    $ lein run <clojure project clj-file or src-dir> pl > example.plantuml
 
 Then plantuml is needed to turn output into e.g. a png image
 
@@ -24,13 +46,29 @@ Then plantuml is needed to turn output into e.g. a png image
 
 Open resulting example.png image with image viewer.
 
+### Graphviz output
+
+Change to download directory and run
+
+    $ lein run <clojure project clj-file or src-dir> gv > example.gv
+
+Then graphviz dot-command is needed to turn output into e.g. a png image
+
+    $ dot -v -Tpng -oexample.png example.gv
+
+Open resulting example.png image with image viewer.
+
 ## Options
 
-No options supported at this point.
+Options cannot be combined
+- (no options): static diagram for browsing
+- pl: plantuml std output, runs and quits
+- gv: graphviz std output, runs and quits
+- ws: "live" updating diagram for browsing
 
-### Known issues
+## Known issues
 
-- Generated diagram is an UML class diagram, which is obviously wrong in clojure context.
+- Generated diagram resembles an UML class diagram, which is obviously wrong in clojure context.
 
 - If your project is big, plantuml may run out of memory and part of image will not be generated. Try to give more memory to plantuml with e.g.
 
@@ -38,11 +76,13 @@ No options supported at this point.
 
 - Tested only in linux.
 
-### Future plans
+## Future plans
 
-- move from plantuml to plain graphviz
-- generate web output for browser usage, maybe imagemap based
+- move from plantuml to plain graphviz (added option)
+- generate web output for browser usage, maybe imagemap based (added basic svg and live updates)
 - proper cli arg support
+- template based output format
+- namespace only view
 
 
 ### About clj-kondo
