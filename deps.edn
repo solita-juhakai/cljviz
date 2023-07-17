@@ -1,4 +1,17 @@
-{:paths ["src"]
- :deps {org.clojure/clojure {:mvn/version "1.10.0"}
-        clj-kondo/clj-kondo {:mvn/version "2022.12.11-SNAPSHOT"}}
- :aliases {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.9.3" :git/sha "e537cd1"}}}}}
+{:paths ["src" "resources"],
+ :deps
+ {org.clojure/clojure {:mvn/version "1.10.0"},
+  org.clojure/test.check {:mvn/version "1.1.1"},
+  clj-kondo/clj-kondo {:mvn/version "2022.12.11-SNAPSHOT"},
+  ring/ring {:mvn/version "1.9.6"},
+  aleph/aleph {:mvn/version "0.6.1"},
+  manifold/manifold {:mvn/version "0.4.0"},
+  metosin/reitit {:mvn/version "0.6.0"},
+  clojure-watch/clojure-watch {:mvn/version "0.1.14"}}
+ :aliases
+ {:test ;; added by neil
+  {:extra-paths ["test"]
+   :extra-deps {io.github.cognitect-labs/test-runner
+                 {:git/tag "v0.5.0" :git/sha "b3fd0d2"}}
+   :main-opts ["-m" "cognitect.test-runner"]
+   :exec-fn cognitect.test-runner.api/test}}}
