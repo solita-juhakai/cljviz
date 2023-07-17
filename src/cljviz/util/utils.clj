@@ -8,7 +8,8 @@
   (map #(select-keys % [:ns :name :defined-by :doc]) m))
 
 (comment
-  (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
+  (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
+  (filter-var-def-keys (vector (first (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))))
 
 
 (defn wonky-hash 
