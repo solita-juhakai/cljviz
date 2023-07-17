@@ -3,6 +3,7 @@
 Cljviz turns your clojure project's clj-kondo analysis output to visual diagram.
 
 ![generated image](cljviz.svg)
+
 >**NOTE**
 >cljviz is **alpha** code and made as a clojure learning project. 
 
@@ -21,7 +22,7 @@ Without options static svg diagram will be created in http://localhost:3000 and 
 
 Change to download directory and run
 
-    $ lein run <clojure project clj-file or src-dir>
+    $ clojure -M -m cljviz.core <clojure project clj-file or src-dir>
 
 Open http://localhost:3000 with browser. The diagram is based on code state at the moment of starting cljviz. 
 
@@ -29,16 +30,16 @@ Open http://localhost:3000 with browser. The diagram is based on code state at t
 
 Change to download directory and run
 
-    $ lein run <clojure project clj-file or src-dir> ws
+    $ clojure -M -m cljviz.core  <clojure project clj-file or src-dir> ws
 
 Open http://localhost:3000/ui with browser. The diagram should update when vars and namespaces are updated in code repo cljviz is watching.
-Note that namespace view live update is WIP.
+Note that namespace view live update is TBA.
 
 ### Plantuml output
 
 Change to download directory and run
 
-    $ lein run <clojure project clj-file or src-dir> pl > example.plantuml
+    $ clojure -M -m cljviz.core  <clojure project clj-file or src-dir> pl > example.plantuml
 
 Then plantuml is needed to turn output into e.g. a png image
 
@@ -50,7 +51,7 @@ Open resulting example.png image with image viewer.
 
 Change to download directory and run
 
-    $ lein run <clojure project clj-file or src-dir> gv > example.gv
+    $ clojure -M -m cljviz.core  <clojure project clj-file or src-dir> gv > example.gv
 
 Then graphviz dot-command is needed to turn output into e.g. a png image
 
@@ -84,6 +85,7 @@ Options cannot be combined
 - template based output format
 - namespace only view
 
+## Development
 
 ### About clj-kondo
 
@@ -94,6 +96,12 @@ How to run clj-kondo analysis from cli
     $ lein clj-kondo --lint ./src/cljviz/core.clj --config '{:analysis true :output {:format :edn}}'
 
 Analysis output can be redirected with standard shell output redirection. Output pretty printing can be done with Calva command for replacing current form with pretty printed form.
+
+### Testing
+
+Test can be run with
+
+    $ clojure -M:test
 
 ## License
 
