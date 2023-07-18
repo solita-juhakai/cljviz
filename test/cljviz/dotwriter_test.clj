@@ -3,7 +3,7 @@
                                              create-ns-dot-node]]
             [clojure.test :refer [deftest is run-tests testing]]))
 
-((deftest create-dot-node-test
+((deftest create-dot-tests
    (testing "Testing create-dot-node from dotwriter.clj"
              (is 
               (=
@@ -13,7 +13,6 @@
                                   :defined-by "clojure.core/defn"
                                   :ns "cljvis.core"}))))))
 
-((deftest create-ns-dot-node-test
       (testing "Testing create-ns-dot-node from dotwriter.clj"
         (is 
          (=
@@ -29,9 +28,8 @@
                                 :name-end-col 28
                                 :name-end-row 1
                                 :name-row 1
-                                :row 1}))))))
+                                :row 1}))))
 
-((deftest create-dot-links-test
    (testing "Testing create-dot-links from dotwriter.clj"
      (is
       (=
@@ -48,10 +46,10 @@
                            :from-var "filter-from-vars",
                            :end-col 28,
                            :row 102,
-                           :to "cljviz.core"}))))))
+                           :to "cljviz.core"}))))
 
- (comment
-   (run-tests)
-          (vector
-    {:hash "A765940430", :name "tes-t", :ns "cljviz.core"} {:hash "A180623784", :name "filter-from-vars", :ns "cljviz.core"})
-   )
+(comment
+  (run-tests)
+  (vector {:hash "A765940430", :name "tes-t", :ns "cljviz.core"} {:hash "A180623784", :name "filter-from-vars", :ns "cljviz.core"})
+  )
+   
