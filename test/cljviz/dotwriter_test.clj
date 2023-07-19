@@ -50,6 +50,5 @@
 
 (comment
   (run-tests)
-  (vector {:hash "A765940430", :name "tes-t", :ns "cljviz.core"} {:hash "A180623784", :name "filter-from-vars", :ns "cljviz.core"})
   )
    
