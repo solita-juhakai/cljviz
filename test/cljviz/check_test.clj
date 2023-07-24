@@ -19,15 +19,19 @@
 
 (tc/quick-check 1000 check-uniq-hash)
 
-(defspec check-uniq-hash
+(defspec check-uniq-hash 
   (prop/for-all [v (gen/set gen/string-alphanumeric)]
                 (apply distinct? map #(m-wonky-hash %) v)))
+;;                (= (count v) (count (into #{} (map #(m-wonky-hash %) v))))))
 
-(comment
+  (comment
   ;; (gen/sample gen/string-alphanumeric)
   ;; (gen/generate gen/string-alphanumeric)
   ;; (gen/sample (gen/set gen/string-alphanumeric))
   ;; (apply distinct? (map #(m-wonky-hash %) ["dd" "ddddddddddddd" "w" ""]))
   ;; (apply distinct? (map #(hash %) ["dd" "ddddddddddddd" "w" "dd"]))
-  (run-tests)
-)
+    (run-tests)
+    ;; (check-uniq-hash 1600)
+    ;; (apply distinct? map #(m-wonky-hash %) ["dd" "ddddddddddddd" "w" "dd"])
+    ;; (= 4 (count (into #{} (map #(m-wonky-hash %) ["dd" "ddddddddddddd" "w" "dde"]))))
+    )
