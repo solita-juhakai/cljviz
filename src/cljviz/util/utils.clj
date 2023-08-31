@@ -40,7 +40,7 @@
     (when (and (when (seq a) a) (when (seq b) b)) m)))
 
 (comment
-  (def v-d (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
+  (def v-d (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src"))))
   (v-d)
   (def v-u (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
   (v-u)
@@ -51,7 +51,7 @@
                 :end-row 37
                 :filename "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"
                 :fixed-arities #{1}
-                :from cljviz.core
+                :from cljviz.util.utils
                 :from-var m-wonky-hash
                 :name wonky-hash
                 :name-col 28
@@ -59,7 +59,7 @@
                 :name-end-row 37
                 :name-row 37
                 :row 37
-                :to cljviz.core})
+                :to cljviz.util.utils})
   (filter-usage-var-defs test-m v-d))
 
 (defn filter-usage-ns-defs

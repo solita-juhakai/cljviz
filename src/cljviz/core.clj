@@ -31,6 +31,7 @@
 (comment
   (-main "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj" "pl")
   (-main "/home/juhakairamo/Projects/clojure/cljviz/src" "gv")
+  (-main "/home/juhakairamo/Projects/clojure/cljviz/src")
   (-main "/home/juhakairamo/Projects/clojure/aoc2022/src")
   (-main "/home/juhakairamo/Projects/clojure/xtdb-inspector/src")
   (-main "/home/juhakairamo/Projects/clojure/tab/src")
@@ -38,4 +39,5 @@
   (last (string/split "c" #"/"))
   (watch-src "/home/juhakairamo/Projects/clojure/cljviz/src")
   (def m-d-t (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
-  (map #(filter-usage-var-defs % m-d-t) (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj")))))
+  (map #(filter-usage-var-defs % m-d-t) (:var-usages (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))
+  )
