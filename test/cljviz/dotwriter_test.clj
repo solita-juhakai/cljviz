@@ -5,30 +5,30 @@
 
 ((deftest create-dot-tests
    (testing "Testing create-dot-node from dotwriter.clj"
-             (is 
-              (=
-               "A819714924[\nid=A819714924\nshape=plaintext\ntooltip=\"tes-t\"\nlabel=<<TABLE BGCOLOR=\"lightyellow\" CELLSPACING=\"0\"><TR><TD>tes-t &lt;&lt;defn&gt;&gt;</TD></TR><TR><TD>foo</TD></TR></TABLE>>\n];\n"
-               (create-dot-node '{:name "tes-t"
-                                  :doc "foo"
-                                  :defined-by "clojure.core/defn"
-                                  :ns "cljvis.core"}))))))
+     (is 
+      (=
+       "A819714924[\nid=A819714924\nshape=plaintext\ntooltip=\"tes-t\"\nlabel=<<TABLE BGCOLOR=\"lightyellow\" CELLSPACING=\"0\"><TR><TD>tes-t &lt;&lt;defn&gt;&gt;</TD></TR><TR><TD>foo</TD></TR></TABLE>>\n];\n"
+       (create-dot-node '{:name "tes-t"
+                          :doc "foo"
+                          :defined-by "clojure.core/defn"
+                          :ns "cljvis.core"}))))
 
-      (testing "Testing create-ns-dot-node from dotwriter.clj"
-        (is 
-         (=
-          "453867576[\nid=453867576\ntooltip=\"cljviz.writer.dotwriter\"\nlabel=\"cljviz.writer.dotwriter\ndoc: ns test doc-string\n\"];\n"
-          (create-ns-dot-node '{:col 1
-                                :doc "ns test doc-string"
-                                :end-col 42
-                                :end-row 6
-                                :filename
-                                "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/writer/dotwriter.clj"
-                                :name cljviz.writer.dotwriter
-                                :name-col 5
-                                :name-end-col 28
-                                :name-end-row 1
-                                :name-row 1
-                                :row 1}))))
+   (testing "Testing create-ns-dot-node from dotwriter.clj"
+     (is 
+      (=
+       "453867576[\nid=453867576\ntooltip=\"cljviz.writer.dotwriter\"\nlabel=\"cljviz.writer.dotwriter\ndoc: ns test doc-string\n\"];\n"
+       (create-ns-dot-node '{:col 1
+                             :doc "ns test doc-string"
+                             :end-col 42
+                             :end-row 6
+                             :filename
+                             "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/writer/dotwriter.clj"
+                             :name cljviz.writer.dotwriter
+                             :name-col 5
+                             :name-end-col 28
+                             :name-end-row 1
+                             :name-row 1
+                             :row 1}))))
 
    (testing "Testing create-dot-links from dotwriter.clj"
      (is
@@ -46,7 +46,7 @@
                            :from-var "filter-from-vars",
                            :end-col 28,
                            :row 102,
-                           :to "cljviz.core"}))))
+                           :to "cljviz.core"}))))))
 
 (comment
   (run-tests)
