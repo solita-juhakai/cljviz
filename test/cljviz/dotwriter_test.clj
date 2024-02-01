@@ -7,8 +7,9 @@
    (testing "Testing create-dot-node from dotwriter.clj"
      (is 
       (=
-       "A819714924[\nid=A819714924\nshape=plaintext\ntooltip=\"tes-t\"\nlabel=<<TABLE BGCOLOR=\"lightyellow\" CELLSPACING=\"0\"><TR><TD>tes-t &lt;&lt;defn&gt;&gt;</TD></TR><TR><TD>foo</TD></TR></TABLE>>\n];\n"
-       (create-dot-node '{:name "tes-t"
+       "A819714924[\nid=A819714924\nshape=plaintext\ntooltip=\"tes-t\"\nlabel=<<TABLE BGCOLOR=\"lightyellow\" CELLSPACING=\"0\"><TR><TD>tes-t &lt;&lt;defn&gt;&gt;</TD></TR><TR><TD>[&quot;[&amp; args]&quot;]</TD></TR><TR><TD>foo</TD></TR></TABLE>>\n];\n"
+       (create-dot-node '{:arglist-strs ["[& args]"]
+                          :name "tes-t"
                           :doc "foo"
                           :defined-by "clojure.core/defn"
                           :ns "cljvis.core"}))))

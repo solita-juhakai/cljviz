@@ -10,4 +10,5 @@
 
 (comment
   (run-tests)
+  (t/run-all-tests #"cljviz.*-test")
   )
