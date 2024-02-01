@@ -5,7 +5,7 @@
 (defn filter-var-def-keys 
   "Filter :ns :name :defined-by :doc fields
    from lint analysis :var-definitions map M" [m]
-  (map #(select-keys % [:ns :name :defined-by :doc]) m))
+  (map #(select-keys % [:arglist-strs :ns :name :defined-by :doc]) m))
 
 (comment
   (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))

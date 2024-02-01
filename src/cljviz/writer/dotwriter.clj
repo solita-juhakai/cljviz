@@ -12,7 +12,8 @@
   ;; dummy is a very long text 1 
   ;; 3 4. with new lines and all
   ;; testi ng}
-  (let [dn (str (m :name))
+  (let [da (str (m :arglist-strs)) 
+        dn (str (m :name))
         ds (last (string/split (name (m :defined-by)) #"/"))
         node (str dn " <<" ds ">>")
         pi (m-wonky-hash (str (m :name) "_" (m :ns)))
@@ -25,16 +26,17 @@
            ;"label=" \u0022 "{" (xml-escape node) "|"(when doc (label-escape doc)) "|}" \u0022 "\n"
            "shape=plaintext\n"
            "tooltip=" \u0022 dn \u0022 "\n"
-           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow" \u0022 " CELLSPACING=" \u0022 "0" \u0022 "><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when doc (br-align (xml-escape doc))) "</TD></TR></TABLE>>\n"
+           "label=<<TABLE BGCOLOR=" \u0022 "lightyellow" \u0022 " CELLSPACING=" \u0022 "0" \u0022 "><TR><TD>" (xml-escape node) "</TD></TR><TR><TD>" (when da (xml-escape da)) "</TD></TR><TR><TD>" (when doc (br-align (xml-escape doc))) "</TD></TR></TABLE>>\n"
 ;           "style=filled\n"
 ;           "fillcolor=lightyellow\n"
            "];\n"))))
 
 (comment
   (map #(apply println (create-dot-node %)) (filter-var-def-keys   (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/cljviz/core.clj"))))) 
-  (create-dot-node {:name "tes-t" :doc "foo" :defined-by "clojure.core/defn" :ns "cljvis.core"})
+  (create-dot-node {:arglist-strs ["[& args]"] :name "tes-t" :doc "foo" :defined-by "clojure.core/defn" :ns "cljvis.core"})
   (create-dot-node {:name "tes-t" :doc "foo" :defined-by "clojure.core/declare" :ns "cljvis.core"})
-  (def t-m '{:col 1
+  (def t-m '{:arglist-strs ["[& args]"]
+             :col 1
              :defined-by clojure.core/defn
              :doc "runs clj-kondo linter with analysis on FILE f"
              :end-col 51
@@ -49,7 +51,8 @@
              :ns cljviz.core
              :row 16})
   (m-wonky-hash (str (t-m :name) "_" (t-m :ns)))
-  (compare "declare" "declare"))
+  (compare "declare" "declare")
+  (create-dot-node t-m))
 
 (defn create-ns-dot-node
   "Create dot node from namespace-definitions analysis map M"

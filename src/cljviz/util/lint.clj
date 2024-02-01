@@ -6,7 +6,7 @@
    see https://github.com/clj-kondo/clj-kondo/tree/master/analysis"
   [f]
   (kondo/run! {:lint (list f)
-               :config {:analysis true
+               :config {:analysis {:arglists true}
                         :output {:format :edn}
                         :var-definitions {:shallow true}}}))
 
