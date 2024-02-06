@@ -203,6 +203,10 @@
                         (filter identity (map #(create-dot-links %)
                                               (filter identity (map #(filter-usage-var-defs % m-d) m-u)))))))
            (str "}\n")))))
+(comment
+  (update-keys (group-by :ns (filter-var-def-keys (:var-definitions (:analysis (run-lint-analysis "/home/juhakairamo/Projects/clojure/cljviz/src/"))))) keyword)
+  (clojure-version)
+  )
 
 (defn ns-dot-writer 
   "Writer for namespace graphviz output"
