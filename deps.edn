@@ -1,6 +1,6 @@
 {:paths ["src" "resources"],
  :deps
- {org.clojure/clojure {:mvn/version "1.10.0"},
+ {org.clojure/clojure {:mvn/version "1.11.1"},
   org.clojure/test.check {:mvn/version "1.1.1"},
   clj-kondo/clj-kondo {:mvn/version "2022.12.11-SNAPSHOT"},
   ring/ring {:mvn/version "1.9.6"},
