@@ -2,6 +2,7 @@
  :deps
  {org.clojure/clojure {:mvn/version "1.12.4"},
   org.clojure/test.check {:mvn/version "1.1.1"},
+  org.slf4j/slf4j-simple {:mvn/version "2.0.16"},
   clj-kondo/clj-kondo {:mvn/version "2024.11.14"},
   hiccup/hiccup {:mvn/version "2.0.0-RC3"},
   ring/ring {:mvn/version "1.12.2"},
