@@ -5,12 +5,19 @@ Cljviz turns your clojure project's clj-kondo analysis output to visual diagram.
 ![generated image](cljviz.svg)
 
 >**NOTE**
->cljviz is **alpha** code and made as a clojure learning project. 
+>cljviz is **alpha** code and made as a clojure learning project.
+
+## Requirements
+
+- **Java**: 17 or later (tested with OpenJDK 17)
+- **Clojure**: 1.12.4 (via Clojure CLI tools)
+- **Graphviz**: For rendering diagrams (install `graphviz` package, `dot` command must be in PATH)
+- **PlantUML**: Optional, for PlantUML output format
+- **Image Viewer**: For viewing generated PNG diagrams
 
 ## Installation
 
 Download code and see Usage/Options below.
-You will need [plantuml](https://plantuml.com) and/or [graphviz](https://graphviz.org) tools. Graphviz `dot`-command needs to be in PATH. Image viewer is also needed.
 
 ## Usage
 
@@ -89,19 +96,31 @@ Options cannot be combined
 
 ### About clj-kondo
 
-clj-kondo can be installed as leiningen plugin as described in https://github.com/clj-kondo/lein-clj-kondo
+Cljviz uses [clj-kondo](https://github.com/clj-kondo/clj-kondo) for static analysis. clj-kondo is included as a dependency in `deps.edn`.
 
-How to run clj-kondo analysis from cli
+How to run clj-kondo analysis from CLI:
 
-    $ lein clj-kondo --lint ./src/cljviz/core.clj --config '{:analysis true :output {:format :edn}}'
+    $ clojure -M -m clj-kondo.main --lint ./src --config '{:analysis true :output {:format :edn}}'
 
-Analysis output can be redirected with standard shell output redirection. Output pretty printing can be done with Calva command for replacing current form with pretty printed form.
+Analysis output can be redirected with standard shell output redirection. This analysis data is what cljviz uses to generate the visual diagrams.
 
 ### Testing
 
-Test can be run with
+Tests can be run with:
 
     $ clojure -M:test
+
+### Checking for Outdated Dependencies
+
+Check for outdated dependencies using the `:outdated` alias:
+
+    $ clojure -M:outdated
+
+### Build Tools
+
+Project uses `deps.edn` for dependency management. For JAR building (if needed), tools.build is configured:
+
+    $ clojure -T:build <task>
 
 ## License
 
